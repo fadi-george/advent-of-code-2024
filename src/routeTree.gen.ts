@@ -10,49 +10,101 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as IndexImport } from "./routes/index";
+import { Route as DaysDayImport } from "./routes/days/$day";
 
 // Create/Update Routes
 
+const IndexRoute = IndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const DaysDayRoute = DaysDayImport.update({
+  id: "/days/$day",
+  path: "/days/$day",
+  getParentRoute: () => rootRoute,
+} as any);
+
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+declare module "@tanstack/react-router" {
+  interface FileRoutesByPath {
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/days/$day": {
+      id: "/days/$day";
+      path: "/days/$day";
+      fullPath: "/days/$day";
+      preLoaderRoute: typeof DaysDayImport;
+      parentRoute: typeof rootRoute;
+    };
+  }
 }
 
 // Create and export the route tree
 
-export interface FileRoutesByFullPath {}
+export interface FileRoutesByFullPath {
+  "/": typeof IndexRoute;
+  "/days/$day": typeof DaysDayRoute;
+}
 
-export interface FileRoutesByTo {}
+export interface FileRoutesByTo {
+  "/": typeof IndexRoute;
+  "/days/$day": typeof DaysDayRoute;
+}
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRoute;
+  "/": typeof IndexRoute;
+  "/days/$day": typeof DaysDayRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
-  fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/days/$day";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/days/$day";
+  id: "__root__" | "/" | "/days/$day";
+  fileRoutesById: FileRoutesById;
 }
 
-export interface RootRouteChildren {}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute;
+  DaysDayRoute: typeof DaysDayRoute;
+}
 
-const rootRouteChildren: RootRouteChildren = {}
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  DaysDayRoute: DaysDayRoute,
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {
   "routes": {
     "__root__": {
       "filePath": "__root.tsx",
-      "children": []
+      "children": [
+        "/",
+        "/days/$day"
+      ]
+    },
+    "/": {
+      "filePath": "index.tsx"
+    },
+    "/days/$day": {
+      "filePath": "days/$day.tsx"
     }
   }
 }
