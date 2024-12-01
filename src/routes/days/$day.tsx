@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -21,28 +21,28 @@ function RouteComponent() {
   const { day } = Route.useLoaderData();
   const [inputTab, setInputTab] = useState("sample");
   const [input, setInput] = useState("");
-
   const [isRunning, setIsRunning] = useState(false);
   const [solution, setSolution] = useState({
     part1: "",
     part2: "",
   });
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (inputTab === "custom") {
-      setInput("");
       return;
     }
-
     fetch(`/day${day}/${inputTab}.txt`)
       .then((res) => res.text())
-      .then(setInput);
+      .then((text) => {
+        if (inputRef.current) inputRef.current.value = text;
+      });
   }, [day, inputTab]);
 
   const runSolution = async () => {
-    const { default: run } = await import(`../../days/${day}/index.ts`);
     setIsRunning(true);
-    const result = await run(input);
+    const { default: run } = await import(`../../days/${day}/index.ts`);
+    const result = await run(inputRef.current?.value || "");
     setIsRunning(false);
 
     setSolution({
@@ -59,7 +59,12 @@ function RouteComponent() {
         <div className="flex-1 bg-white p-4 rounded-lg shadow-md">
           <Tabs
             defaultValue={inputTab}
-            onValueChange={setInputTab}
+            onValueChange={(value) => {
+              setInputTab(value);
+              if (value === "custom" && inputRef.current) {
+                inputRef.current.value = input;
+              }
+            }}
             className="w-full flex flex-col h-full"
           >
             <TabsList>
@@ -70,8 +75,9 @@ function RouteComponent() {
 
             <Textarea
               disabled={inputTab !== "custom"}
+              ref={inputRef}
               className="mt-4 h-full"
-              value={input}
+              onChange={(e) => setInput(e.target.value)}
             />
           </Tabs>
         </div>
@@ -91,7 +97,7 @@ function RouteComponent() {
           <Button
             className="mt-4"
             disabled={isRunning}
-            onClick={async () => {
+            onClick={() => {
               runSolution();
             }}
           >
