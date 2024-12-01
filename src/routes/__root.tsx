@@ -6,7 +6,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="p-4 bg-slate-200 min-h-screen flex flex-col">
+    <div className="p-8 bg-slate-200 min-h-screen flex flex-col">
       <Outlet />
     </div>
   );
