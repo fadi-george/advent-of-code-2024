@@ -2,76 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
+  height: 100vh;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+#root {
+  height: 100%;
+  width: 100%;
 }
 
 @layer base {
+  @font-face {
+    font-family: "Product Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/assets/fonts/ProductSans-Regular.ttf) format("ttf");
+  }
+  @font-face {
+    font-family: "Product Sans";
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url(/assets/fonts/ProductSans-Light.ttf) format("ttf");
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -126,7 +82,6 @@ button:focus-visible {
     --chart-5: 340 75% 55%;
   }
 }
-
 @layer base {
   * {
     @apply border-border;
@@ -134,4 +89,13 @@ button:focus-visible {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.bg-pattern {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg width=%221920%22 height=%221080%22 xmlns=%22http:%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3Cpattern id=%22b%22 x=%220%22 y=%220%22 width=%2257.6%22 height=%2257.6%22 patternUnits=%22userSpaceOnUse%22%3E%3Cg clip-path=%22url(%23radius-clip)%22 transform=%22scale(.5)%22%3E%3Csvg width=%2257.6%22 height=%2257.6%22 viewBox=%220 0 100 100%22%3E%3Cg clip-path=%22url(%23a)%22 fill=%22rgba(69%2C 247%2C 120%2C 1)%22%3E%3Cpath opacity=%22.2%22 d=%22M50 50V0L0 50h50Z%22%2F%3E%3Cpath opacity=%22.6%22 d=%22M50 100V50L0 100h50Z%22%2F%3E%3Cpath opacity=%22.4%22 d=%22M100 50V0L50 50h50Z%22%2F%3E%3Cpath d=%22M100 100V50l-50 50h50Z%22%2F%3E%3C%2Fg%3E%3Cdefs%3E%3CclipPath id=%22a%22%3E%3Cpath fill=%22rgba(69%2C 247%2C 120%2C 1)%22 transform=%22rotate(90 50 50)%22 d=%22M0 0h100v100H0z%22%2F%3E%3C%2FclipPath%3E%3C%2Fdefs%3E%3C%2Fsvg%3E%3C%2Fg%3E%3Cg clip-path=%22url(%23radius-clip)%22 transform=%22matrix(.5 0 0 .5 28.8 28.8)%22%3E%3Csvg width=%2257.6%22 height=%2257.6%22 viewBox=%220 0 100 100%22%3E%3Cg clip-path=%22url(%23a)%22 fill=%22rgba(69%2C 247%2C 120%2C 1)%22%3E%3Cpath opacity=%22.2%22 d=%22M50 50V0L0 50h50Z%22%2F%3E%3Cpath opacity=%22.6%22 d=%22M50 100V50L0 100h50Z%22%2F%3E%3Cpath opacity=%22.4%22 d=%22M100 50V0L50 50h50Z%22%2F%3E%3Cpath d=%22M100 100V50l-50 50h50Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E%3C%2Fg%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22rgba(6%2C 102%2C 35%2C 1)%22%2F%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22url(%23b)%22%2F%3E%3C%2Fsvg%3E");
 }
