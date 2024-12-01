@@ -57,7 +57,7 @@ const DayCard = ({ stars, day }: { stars: number; day: number }) => {
 
   return (
     <Link to={`/days/${day + 1}`}>
-      <Card className="min-w-24">
+      <Card className="min-w-24 hover:scale-105 transition-all">
         <CardHeader className="text-center">
           <h2 className="text-lg font-bold">Day {day + 1}</h2>
         </CardHeader>

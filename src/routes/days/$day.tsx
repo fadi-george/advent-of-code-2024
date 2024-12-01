@@ -1,9 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-
-import { Button } from "@/components/ui/button";
+import { FaArrowLeft } from "react-icons/fa";
 
 export const Route = createFileRoute("/days/$day")({
   component: RouteComponent,
@@ -19,6 +19,8 @@ export const Route = createFileRoute("/days/$day")({
 
 function RouteComponent() {
   const { day } = Route.useLoaderData();
+  const navigate = Route.useNavigate();
+
   const [inputTab, setInputTab] = useState("sample");
   const [input, setInput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
@@ -53,7 +55,19 @@ function RouteComponent() {
 
   return (
     <div className="max-w-screen-lg mx-auto w-full flex-1 flex flex-col">
-      <h1 className="text-2xl font-bold">Day {day}</h1>
+      {/* Header */}
+      <span className="flex items-center gap-1 ">
+        <Button
+          variant="ghost"
+          onClick={() => navigate({ to: "/" })}
+          size="icon"
+          className="ml-[-10px] leading-none"
+        >
+          <FaArrowLeft />
+        </Button>
+        <h1 className="text-2xl font-bold">Day {day}</h1>
+      </span>
+
       <div className="flex mx-auto gap-4 mt-4 w-full flex-1 max-h-[600px]">
         {/* Inputs */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow-md">
