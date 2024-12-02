@@ -7,8 +7,16 @@ Solutions written in Typescript.
 
 ## Running
 
-Can run the dev script to open the Vite dev server.
+Create an `.env` file in the server folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
+You can grab your session cookie by looking at your headers in the network log on adventofcode.com.
 
+Run the hono backend server:
+```
+cd server;
+npm run dev;
+```
+
+Run the frontend dev server:
 ```
 cd frontend;
 npm run dev;
