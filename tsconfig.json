@@ -25,5 +25,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "bun/day1"]
+  "include": ["src", "bun"]
 }

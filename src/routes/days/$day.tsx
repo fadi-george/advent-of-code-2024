@@ -48,8 +48,8 @@ function RouteComponent() {
     setIsRunning(false);
 
     setSolution({
-      part1: result.part1,
-      part2: result.part2,
+      part1: result.part1.toString(),
+      part2: result.part2.toString(),
     });
   };
 

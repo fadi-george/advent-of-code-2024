@@ -34,7 +34,7 @@ export default (input: string) => {
   };
 
   return {
-    part1: part1().toString(),
-    part2: part2().toString(),
+    part1: part1(),
+    part2: part2(),
   };
 };
