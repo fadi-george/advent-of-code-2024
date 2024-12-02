@@ -1,25 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { getStarsQueryOptions } from "@/hooks/api";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import { GiRoundStar } from "react-icons/gi";
 
 export const Route = createFileRoute("/days/$day")({
   component: RouteComponent,
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     const day = +params.day;
     if (day < 1 || day > 25) {
       throw redirect({ to: "/" });
     }
-
-    return { day };
+    return queryClient.ensureQueryData(getStarsQueryOptions);
   },
 });
 
 function RouteComponent() {
-  const { day } = Route.useLoaderData();
+  const { data: stars } = useSuspenseQuery(getStarsQueryOptions);
   const navigate = Route.useNavigate();
+  const day = +Route.useParams().day;
+  const dayStars = stars[day - 1];
 
   const [inputTab, setInputTab] = useState("sample");
   const [input, setInput] = useState("");
@@ -70,6 +74,14 @@ function RouteComponent() {
           <FaArrowLeft />
         </Button>
         <h1 className="text-2xl font-bold">Day {day}</h1>
+        <span className="flex items-center gap-1 ml-2">
+          {new Array(dayStars).fill(0).map((_, i) => (
+            <GiRoundStar
+              key={i}
+              className="w-5 h-5 text-yellow-400 stroke-black stroke-[10%]"
+            />
+          ))}
+        </span>
       </span>
 
       <div className="flex mx-auto gap-4 mt-4 w-full flex-1 max-h-[600px]">

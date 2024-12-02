@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getStarsQueryOptions } from "@/hooks/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FaRegStar, FaStar } from "react-icons/fa";
+import { FaRegStar } from "react-icons/fa";
+import { GiRoundStar } from "react-icons/gi";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -27,8 +28,8 @@ function RouteComponent() {
 
 const DayCard = ({ stars, day }: { stars: number; day: number }) => {
   const getStars = () => {
-    const GoldStar = <FaStar className="text-yellow-400" />;
-    const RegStar = <FaRegStar className="opacity-25" />;
+    const GoldStar = <GiRoundStar className="text-yellow-400" />;
+    const RegStar = <GiRoundStar className="opacity-15" />;
     switch (stars) {
       case 2:
         return (
