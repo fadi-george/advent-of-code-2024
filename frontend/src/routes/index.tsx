@@ -8,14 +8,7 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   return (
-    <div
-      className="flex-1 flex flex-col justify-center items-center "
-      style={
-        {
-          // background: "radial-gradient(at right top, #01FF39, #52ADD3)",
-        }
-      }
-    >
+    <div className="flex-1 flex flex-col justify-center items-center ">
       <h1 className="text-4xl font-bold">🎄 Advent of Code 2024 🎄</h1>
       <div className="grid grid-cols-5 gap-4 mt-8">
         {DAYS.map((stars, day) => {
@@ -70,5 +63,5 @@ const DayCard = ({ stars, day }: { stars: number; day: number }) => {
 };
 
 const DAYS = [
-  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
