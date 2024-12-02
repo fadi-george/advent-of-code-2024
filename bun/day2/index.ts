@@ -32,68 +32,73 @@ So, in this example, 2 reports are safe.
 
 Analyze the unusual data from the engineers. How many reports are safe?
 
+Your puzzle answer was 257.
+
+--- Part Two ---
+The engineers are surprised by the low number of safe reports until they realize they forgot to tell you about the Problem Dampener.
+
+The Problem Dampener is a reactor-mounted module that lets the reactor safety systems tolerate a single bad level in what would otherwise be a safe report. It's like the bad level never happened!
+
+Now, the same rules apply as before, except if removing a single level from an unsafe report would make it safe, the report instead counts as safe.
+
+More of the above example's reports are now safe:
+
+7 6 4 2 1: Safe without removing any level.
+1 2 7 8 9: Unsafe regardless of which level is removed.
+9 7 6 2 1: Unsafe regardless of which level is removed.
+1 3 2 4 5: Safe by removing the second level, 3.
+8 6 4 4 1: Safe by removing the third level, 4.
+1 3 6 7 9: Safe without removing any level.
+Thanks to the Problem Dampener, 4 reports are actually safe!
+
+Update your analysis by handling situations where the Problem Dampener can remove a single level from unsafe reports. How many reports are now safe?
+
+Your puzzle answer was 328.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 
  */
 import { readFile } from "../../src/lib/file";
 
-const levels: number[][] = [];
-readFile(import.meta.dir).forEach((line) => {
-  levels.push(line.split(/\s+/).map(Number));
-});
+const levels = readFile(import.meta.dir).map((line) =>
+  line.split(/\s+/).map(Number)
+);
 
-const checkLevelSafety = (level: number[], allowedErrors = 0) => {
-  if (allowedErrors < 0) return false;
-  let errInd = -1;
+const checkLevelSafety = (levels: number[]): boolean => {
+  const isIncreasing = levels[1] > levels[0];
 
-  const isIncreasing = level[1] > level[0];
-  const diffs = [0];
-  for (let i = 1; i < level.length; i++) {
-    diffs.push(level[i] - level[i - 1]);
+  for (let i = 1; i < levels.length; i++) {
+    const diff = levels[i] - levels[i - 1];
+    const absDiff = Math.abs(diff);
+
+    if (absDiff > 3 || absDiff < 1) return false;
+    if (isIncreasing && diff <= 0) return false;
+    if (!isIncreasing && diff >= 0) return false;
   }
 
-  let i = 0;
-  for (i = 0; i < diffs.length; i++) {
-    const absDiff = Math.abs(diffs[i]);
-    if (i === 0) continue;
-    if (absDiff > 3 || absDiff < 1) {
-      break;
-    }
-    if (isIncreasing && diffs[i] < 0) {
-      break;
-    } else if (!isIncreasing && diffs[i] > 0) {
-      break;
-    }
-  }
-  if (i !== diffs.length) errInd = i;
-  if (errInd === -1) return true;
-  if (allowedErrors === 0) return false;
-
-  const adjustedLevel = level.filter((_, j) => j !== errInd);
-  return checkLevelSafety(adjustedLevel, allowedErrors - 1);
+  return true;
 };
 
-const checkLevelsSafety = (allowedErrors = 0) => {
-  const safeLevels = levels.map((level) =>
-    checkLevelSafety(level, allowedErrors)
-  );
-  // console.log(safeLevels);
-  return safeLevels.filter(Boolean).length;
-};
+const countSafeLevels = (levels: boolean[]): number =>
+  levels.filter(Boolean).length;
 
 const part1 = () => {
-  const res = checkLevelsSafety();
-  console.log("Part 1: ", res);
+  const safeLevels = levels.map(checkLevelSafety);
+  console.log("Part 1:", countSafeLevels(safeLevels));
 };
 
 const part2 = () => {
-  const res = checkLevelsSafety(1);
-  console.log("Part 2: ", res);
+  const safeLevels = levels.map((level) => {
+    for (let i = 0; i < level.length; i++) {
+      const adjustedLevel = level.filter((_, j) => j !== i);
+      if (checkLevelSafety(adjustedLevel)) return true;
+    }
+    return false;
+  });
+
+  console.log("Part 2:", countSafeLevels(safeLevels));
 };
 
-// 257 - rigth
 part1();
-
-// 294 - wrong
-// 298 - wrong
-// 304 - too low
 part2();
