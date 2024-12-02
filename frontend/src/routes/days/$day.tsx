@@ -27,6 +27,7 @@ function RouteComponent() {
   const [solution, setSolution] = useState({
     part1: "",
     part2: "",
+    runTime: 0,
   });
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,12 +45,15 @@ function RouteComponent() {
   const runSolution = async () => {
     setIsRunning(true);
     const { default: run } = await import(`../../days/${day}/index.ts`);
-    const result = await run(inputRef.current?.value || "");
+    const start = performance.now();
+    const result = run(inputRef.current?.value || "");
+    const end = performance.now();
     setIsRunning(false);
 
     setSolution({
       part1: result.part1.toString(),
       part2: result.part2.toString(),
+      runTime: end - start,
     });
   };
 
@@ -105,6 +109,10 @@ function RouteComponent() {
             <div>
               <h2 className="text-lg font-bold">Part 2</h2>
               <p>{solution.part2 || "Not run"}</p>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold">Run time</h2>
+              <p>{solution.runTime.toFixed(3)}ms</p>
             </div>
           </div>
 
