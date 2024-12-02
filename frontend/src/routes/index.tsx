@@ -1,17 +1,23 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { getStarsQueryOptions } from "@/hooks/api";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(getStarsQueryOptions),
 });
 
 function RouteComponent() {
+  const { data: stars } = useSuspenseQuery(getStarsQueryOptions);
+
   return (
     <div className="flex-1 flex flex-col justify-center items-center ">
       <h1 className="text-4xl font-bold">🎄 Advent of Code 2024 🎄</h1>
       <div className="grid grid-cols-5 gap-4 mt-8">
-        {DAYS.map((stars, day) => {
+        {stars.map((stars, day) => {
           return <DayCard key={day} stars={stars} day={day} />;
         })}
       </div>
@@ -61,7 +67,3 @@ const DayCard = ({ stars, day }: { stars: number; day: number }) => {
     </Link>
   );
 };
-
-const DAYS = [
-  2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-];
