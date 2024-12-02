@@ -59,17 +59,17 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 
  */
-import { readFile } from "../../src/lib/file";
+import { readFile } from "../lib/file";
 
-const levels = readFile(import.meta.dir).map((line) =>
+const reports = readFile(import.meta.dir).map((line) =>
   line.split(/\s+/).map(Number)
 );
 
-const checkLevelSafety = (levels: number[]): boolean => {
-  const isIncreasing = levels[1] > levels[0];
+const checkReportSafety = (report: number[]) => {
+  const isIncreasing = report[1] > report[0];
 
-  for (let i = 1; i < levels.length; i++) {
-    const diff = levels[i] - levels[i - 1];
+  for (let i = 1; i < report.length; i++) {
+    const diff = report[i] - report[i - 1];
     const absDiff = Math.abs(diff);
 
     if (absDiff > 3 || absDiff < 1) return false;
@@ -80,25 +80,24 @@ const checkLevelSafety = (levels: number[]): boolean => {
   return true;
 };
 
-const countSafeLevels = (levels: boolean[]): number =>
-  levels.filter(Boolean).length;
+const countSafeReports = (reports: boolean[]) => reports.filter(Boolean).length;
 
 const part1 = () => {
-  const safeLevels = levels.map(checkLevelSafety);
-  console.log("Part 1:", countSafeLevels(safeLevels));
+  const safeReports = reports.map(checkReportSafety);
+  return countSafeReports(safeReports);
 };
 
 const part2 = () => {
-  const safeLevels = levels.map((level) => {
-    for (let i = 0; i < level.length; i++) {
-      const adjustedLevel = level.filter((_, j) => j !== i);
-      if (checkLevelSafety(adjustedLevel)) return true;
+  const safeReports = reports.map((report) => {
+    for (let i = 0; i < report.length; i++) {
+      const adjustedReport = report.filter((_, j) => j !== i);
+      if (checkReportSafety(adjustedReport)) return true;
     }
     return false;
   });
 
-  console.log("Part 2:", countSafeLevels(safeLevels));
+  return countSafeReports(safeReports);
 };
 
-part1();
-part2();
+console.log("Part 1:", part1());
+console.log("Part 2:", part2());

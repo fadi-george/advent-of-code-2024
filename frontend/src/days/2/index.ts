@@ -1,4 +1,4 @@
-const checkReportSafety = (report: number[]): boolean => {
+const checkReportSafety = (report: number[]) => {
   const isIncreasing = report[1] > report[0];
 
   for (let i = 1; i < report.length; i++) {
@@ -13,8 +13,7 @@ const checkReportSafety = (report: number[]): boolean => {
   return true;
 };
 
-const countSafeReports = (reports: boolean[]): number =>
-  reports.filter(Boolean).length;
+const countSafeReports = (reports: boolean[]) => reports.filter(Boolean).length;
 
 export default (input: string) => {
   const reports = input

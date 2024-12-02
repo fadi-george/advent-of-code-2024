@@ -1,6 +1,6 @@
-import "./array"; // array prototype methods
 import fs from "fs";
 import path from "path";
+import "./array"; // array prototype methods
 const file = import.meta.env.FILE;
 
 export const readFile = (dir = "./", regex: string | RegExp = "\n") => {
