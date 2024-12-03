@@ -11,8 +11,10 @@ Solutions written in Typescript.
 
 Can run individual files located in the `aoc` folder by passing in the `FILE`, `YEAR`, and `DAY` environment variables. E.g.
 
+Create a `txt` file in the `aoc/2024/day<some-number>` folder. If the file is named `input.txt`, then you can run the file with:
+
 ```
-FILE=sample YEAR=2024 DAY=1 bun aoc/index.ts
+FILE=input YEAR=2024 DAY=1 bun aoc/index.ts
 ```
 
 ### Webp App + Server
