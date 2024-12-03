@@ -1,8 +1,8 @@
-export default (input: string) => {
+export default (inputStr: string) => {
   const leftList: number[] = [];
   const rightList: number[] = [];
 
-  input.split("\n").forEach((line) => {
+  inputStr.split("\n").forEach((line) => {
     const [a, b] = line.split(/\s+/);
     leftList.push(+a);
     rightList.push(+b);
@@ -30,6 +30,7 @@ export default (input: string) => {
       (acc, num) => acc + num * (freq[num] || 0),
       0
     );
+
     return score;
   };
 

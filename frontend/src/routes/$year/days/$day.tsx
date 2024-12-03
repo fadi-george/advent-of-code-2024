@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getInputsQueryOptions, getStarsQueryOptions } from "@/hooks/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { GiRoundStar } from "react-icons/gi";
 
@@ -12,26 +12,32 @@ export const Route = createFileRoute("/$year/days/$day")({
   component: RouteComponent,
   loader: async ({ params, context: { queryClient } }) => {
     const year = params.year;
-    const day = +params.day;
-    if (day < 1 || day > 25) {
+    const day = params.day;
+    if (+day < 1 || +day > 25) {
       throw redirect({ to: "/" });
     }
     await queryClient.ensureQueryData(getStarsQueryOptions(year));
-    await queryClient.ensureQueryData(getInputsQueryOptions);
+    await queryClient.ensureQueryData(getInputsQueryOptions(year, day));
   },
 });
 
+enum InputTab {
+  Input = "input",
+  Custom = "custom",
+}
+
 function RouteComponent() {
-  const year = Route.useParams().year;
+  const { day, year } = Route.useParams();
+
   const { data: stars } = useSuspenseQuery(getStarsQueryOptions(year));
-  const { data: inputs } = useSuspenseQuery(getInputsQueryOptions);
-  console.log(inputs);
+  const { data: inputText } = useSuspenseQuery(
+    getInputsQueryOptions(year, day)
+  );
 
   const navigate = Route.useNavigate();
-  const day = +Route.useParams().day;
-  const dayStars = stars[day - 1];
+  const dayStars = stars[+day - 1];
 
-  const [inputTab, setInputTab] = useState("sample");
+  const [inputTab, setInputTab] = useState(InputTab.Input);
   const [input, setInput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [solution, setSolution] = useState({
@@ -39,32 +45,17 @@ function RouteComponent() {
     part2: "",
     runTime: 0,
   });
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (inputTab === "custom") {
-      return;
-    }
-    fetch(`/day${day}/${inputTab}.txt`)
-      .then((res) => res.text())
-      .then((text) => {
-        if (inputRef.current) inputRef.current.value = text;
-      });
-  }, [day, inputTab]);
-
+  const userText = inputTab === InputTab.Custom ? input : inputText;
   const runSolution = async () => {
     setIsRunning(true);
-    const { default: run } = await import(`../../days/${day}/index.ts`);
-    const start = performance.now();
-    const result = run(inputRef.current?.value || "");
-    const end = performance.now();
+    const result = await fetch(`/api/inputs/${year}/${day}?type=js`, {
+      method: "POST",
+      body: JSON.stringify({ input: userText.trim() }),
+    }).then((res) => res.json());
     setIsRunning(false);
 
-    setSolution({
-      part1: result.part1.toString(),
-      part2: result.part2.toString(),
-      runTime: end - start,
-    });
+    setSolution(result);
   };
 
   return (
@@ -96,24 +87,20 @@ function RouteComponent() {
           <Tabs
             defaultValue={inputTab}
             onValueChange={(value) => {
-              setInputTab(value);
-              if (value === "custom" && inputRef.current) {
-                inputRef.current.value = input;
-              }
+              setInputTab(value as InputTab);
             }}
             className="w-full flex flex-col h-full"
           >
             <TabsList>
-              <TabsTrigger value="sample">Sample</TabsTrigger>
-              <TabsTrigger value="input">Input</TabsTrigger>
-              <TabsTrigger value="custom">Custom</TabsTrigger>
+              <TabsTrigger value={InputTab.Input}>Input</TabsTrigger>
+              <TabsTrigger value={InputTab.Custom}>Custom</TabsTrigger>
             </TabsList>
 
             <Textarea
-              disabled={inputTab !== "custom"}
-              ref={inputRef}
+              disabled={inputTab !== InputTab.Custom}
               className="mt-4 h-full"
               onChange={(e) => setInput(e.target.value)}
+              value={userText}
             />
           </Tabs>
         </div>

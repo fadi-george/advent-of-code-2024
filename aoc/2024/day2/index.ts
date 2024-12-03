@@ -59,11 +59,33 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 
  */
-import { readFile } from "../../lib/file";
+export default (input: string) => {
+  const reports = input
+    .split("\n")
+    .map((line) => line.split(/\s+/).map(Number));
 
-const reports = readFile(import.meta.dir).map((line) =>
-  line.split(/\s+/).map(Number)
-);
+  const part1 = () => {
+    const safeReports = reports.map(checkReportSafety);
+    return countSafeReports(safeReports);
+  };
+
+  const part2 = () => {
+    const safeReports = reports.map((report) => {
+      for (let i = 0; i < report.length; i++) {
+        const adjustedReport = report.filter((_, j) => j !== i);
+        if (checkReportSafety(adjustedReport)) return true;
+      }
+      return false;
+    });
+
+    return countSafeReports(safeReports);
+  };
+
+  return {
+    part1: part1(),
+    part2: part2(),
+  };
+};
 
 const checkReportSafety = (report: number[]) => {
   const isIncreasing = report[1] > report[0];
@@ -81,23 +103,3 @@ const checkReportSafety = (report: number[]) => {
 };
 
 const countSafeReports = (reports: boolean[]) => reports.filter(Boolean).length;
-
-const part1 = () => {
-  const safeReports = reports.map(checkReportSafety);
-  return countSafeReports(safeReports);
-};
-
-const part2 = () => {
-  const safeReports = reports.map((report) => {
-    for (let i = 0; i < report.length; i++) {
-      const adjustedReport = report.filter((_, j) => j !== i);
-      if (checkReportSafety(adjustedReport)) return true;
-    }
-    return false;
-  });
-
-  return countSafeReports(safeReports);
-};
-
-console.log("Part 1:", part1());
-console.log("Part 2:", part2());

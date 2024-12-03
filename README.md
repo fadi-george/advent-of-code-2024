@@ -7,16 +7,28 @@ Solutions written in Typescript.
 
 ## Running
 
+### CLI
+
+Can run individual files located in the `aoc` folder by passing in the `FILE`, `YEAR`, and `DAY` environment variables. E.g.
+
+```
+FILE=sample YEAR=2024 DAY=1 bun aoc/index.ts
+```
+
+### Webp App + Server
+
 Create an `.env` file in the server folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
 You can grab your session cookie by looking at your headers in the network log on adventofcode.com.
 
 Run the hono backend server:
+
 ```
 cd server;
 npm run dev;
 ```
 
 Run the frontend dev server:
+
 ```
 cd frontend;
 npm run dev;

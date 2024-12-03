@@ -9,11 +9,12 @@ export const getStarsQueryOptions = (year: string) =>
         return res.json();
       }),
   });
-export const getInputsQueryOptions = queryOptions<Record<string, string>>({
-  queryKey: ["get-inputs"],
-  queryFn: () =>
-    fetch("/api/inputs").then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch inputs");
-      return res.json();
-    }),
-});
+export const getInputsQueryOptions = (year: string, day: string) =>
+  queryOptions<string>({
+    queryKey: ["get-inputs", year, day],
+    queryFn: () =>
+      fetch(`/api/inputs/${year}/${day}`).then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch inputs");
+        return res.text();
+      }),
+  });
