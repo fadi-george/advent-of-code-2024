@@ -38,49 +38,47 @@ Handle the new instructions; what do you get if you add up all of the results of
 */
 const part1Values: [number, number][] = [];
 const part2Values: [number, number][] = [];
+let ignored = false;
 
 readFile(import.meta.dir).forEach((line) => {
   // match all mul instructions or don't() or do() and include the index
   const multMatches = line.matchAll(/mul\((\d+),(\d+)\)/g) || [];
   const doDontMatches = line.matchAll(/do\(\)|don't\(\)/g) || [];
-  // console.log(multMatches, doDontMatches);
 
-  let ignore = false;
-  const doRange: number[][] = [];
   let doDontIndex = 0;
   const doDontEntries = [...doDontMatches].map((m) => ({
     index: m.index,
     value: [...m.values()][0],
   }));
-  if (doDontEntries.length === 0) {
-    doRange.push([0, line.length]);
-  } else {
-    let start: number | null = 0;
-    for (let i = 0; i < doDontEntries.length; i++) {
-      const { index, value } = doDontEntries[i];
-      if (value === "don't()") {
-        doRange.push([start!, index]);
-        start = null;
-      } else if (value === "do()") {
-        start = index;
-      }
-    }
-    if (start !== null) {
-      doRange.push([start, line.length]);
-    }
-  }
 
   for (const match of multMatches) {
-    const { index, values } = match;
+    const { index } = match;
     const [_, x, y] = match.values();
     part1Values.push([+x, +y]);
 
-    const isNotIgnored = doRange.some(([start, end]) => {
-      return index >= start && index < end;
-    });
+    for (let j = doDontIndex; j < doDontEntries.length; j++) {
+      const { index: k, value } = doDontEntries[j];
+      if (k > index) {
+        doDontIndex = j;
+        break;
+      }
+      if (value === "don't()") {
+        ignored = true;
+      } else if (value === "do()") {
+        ignored = false;
+      }
+    }
 
-    if (isNotIgnored) {
+    if (!ignored) {
       part2Values.push([+x, +y]);
+    }
+  }
+  for (let j = doDontIndex; j < doDontEntries.length; j++) {
+    const { value } = doDontEntries[j];
+    if (value === "don't()") {
+      ignored = true;
+    } else if (value === "do()") {
+      ignored = false;
     }
   }
 });
@@ -97,5 +95,3 @@ const part2 = () => {
 
 console.log("Part 1: ", part1());
 console.log("Part 2: ", part2());
-
-// part 2 - 123954054 // wrong
