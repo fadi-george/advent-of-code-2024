@@ -1,13 +1,22 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { getStarsQueryOptions } from "@/hooks/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { GiRoundStar } from "react-icons/gi";
 
 export const Route = createFileRoute("/$year/")({
   component: RouteComponent,
   loader: ({ params, context: { queryClient } }) => {
     const year = params.year;
+    if (+year < 2015 || +year > new Date().getFullYear() || isNaN(+year)) {
+      redirect({ to: `/${year}` });
+    }
     return queryClient.ensureQueryData(getStarsQueryOptions(year));
   },
 });
@@ -18,7 +27,9 @@ function RouteComponent() {
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center ">
-      <h1 className="text-4xl font-bold">🎄 Advent of Code {year} 🎄</h1>
+      <h1 className="text-4xl font-bold">
+        🎄 Advent of Code <YearDropdown year={+year} /> 🎄
+      </h1>
       <div className="grid grid-cols-5 gap-4 mt-8">
         {stars.map((stars, day) => {
           return <DayCard key={day} stars={stars} day={day} />;
@@ -27,6 +38,34 @@ function RouteComponent() {
     </div>
   );
 }
+
+const YearDropdown = ({ year }: { year: number }) => {
+  const navigate = Route.useNavigate();
+  const currentYear = new Date().getFullYear();
+  const years = new Array(currentYear - 2015 + 1)
+    .fill(0)
+    .map((_, i) => currentYear - i);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="cursor-pointer underline decoration-dotted underline-offset-[8px]">
+        {year}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="min-w-[80px] justify-center max-h-[148px] overflow-y-auto">
+        {years.map((y) => (
+          <DropdownMenuItem
+            className=" justify-center text-lg "
+            key={y}
+            disabled={y === year}
+            onClick={() => navigate({ to: `/${y}` })}
+          >
+            {y}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 const DayCard = ({ stars, day }: { stars: number; day: number }) => {
   const getStars = () => {
