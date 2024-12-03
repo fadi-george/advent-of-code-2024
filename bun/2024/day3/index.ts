@@ -37,11 +37,52 @@ This time, the sum of the results is 48 (2*4 + 8*5).
 Handle the new instructions; what do you get if you add up all of the results of just the enabled multiplications?
 */
 const part1Values: [number, number][] = [];
+const part2Values: [number, number][] = [];
+
 readFile(import.meta.dir).forEach((line) => {
-  line.match(/mul\((\d+),(\d+)\)/g)?.forEach((match) => {
-    const [_, x, y] = match.match(/mul\((\d+),(\d+)\)/)!;
+  // match all mul instructions or don't() or do() and include the index
+  const multMatches = line.matchAll(/mul\((\d+),(\d+)\)/g) || [];
+  const doDontMatches = line.matchAll(/do\(\)|don't\(\)/g) || [];
+  // console.log(multMatches, doDontMatches);
+
+  let ignore = false;
+  const doRange: number[][] = [];
+  let doDontIndex = 0;
+  const doDontEntries = [...doDontMatches].map((m) => ({
+    index: m.index,
+    value: [...m.values()][0],
+  }));
+  if (doDontEntries.length === 0) {
+    doRange.push([0, line.length]);
+  } else {
+    let start: number | null = 0;
+    for (let i = 0; i < doDontEntries.length; i++) {
+      const { index, value } = doDontEntries[i];
+      if (value === "don't()") {
+        doRange.push([start!, index]);
+        start = null;
+      } else if (value === "do()") {
+        start = index;
+      }
+    }
+    if (start !== null) {
+      doRange.push([start, line.length]);
+    }
+  }
+
+  for (const match of multMatches) {
+    const { index, values } = match;
+    const [_, x, y] = match.values();
     part1Values.push([+x, +y]);
-  });
+
+    const isNotIgnored = doRange.some(([start, end]) => {
+      return index >= start && index < end;
+    });
+
+    if (isNotIgnored) {
+      part2Values.push([+x, +y]);
+    }
+  }
 });
 
 const part1 = () => {
@@ -49,7 +90,12 @@ const part1 = () => {
   return sum;
 };
 
-const part2 = () => {};
+const part2 = () => {
+  const sum = part2Values.reduce((acc, [x, y]) => acc + x * y, 0);
+  return sum;
+};
 
 console.log("Part 1: ", part1());
 console.log("Part 2: ", part2());
+
+// part 2 - 123954054 // wrong
