@@ -25,7 +25,7 @@ export const inputsRoute = new Hono()
 
     if (query === "js") {
       const { default: run } = (await import(
-        `../../bun/${year}/day${day}/index.ts`
+        `../../aoc/${year}/day${day}/index.ts`
       )) as {
         default: (input: string) => {
           part1: string;
