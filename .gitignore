@@ -11,7 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-aoc/*.txt
 
 # Editor directories and files
 .vscode/*
@@ -24,3 +23,6 @@ aoc/*.txt
 *.sln
 *.sw?
 .env
+
+# Aoc
+aoc/**/*.txt
