@@ -38,59 +38,29 @@ Handle the new instructions; what do you get if you add up all of the results of
 */
 const part1Values: [number, number][] = [];
 const part2Values: [number, number][] = [];
+
 let ignored = false;
-
 readFile(import.meta.dir).forEach((line) => {
-  // match all mul instructions or don't() or do() and include the index
-  const multMatches = line.matchAll(/mul\((\d+),(\d+)\)/g) || [];
-  const doDontMatches = line.matchAll(/do\(\)|don't\(\)/g) || [];
-
-  let doDontIndex = 0;
-  const doDontEntries = [...doDontMatches].map((m) => ({
-    index: m.index,
-    value: [...m.values()][0],
-  }));
-
-  for (const match of multMatches) {
-    const { index } = match;
-    const [_, x, y] = match.values();
-    part1Values.push([+x, +y]);
-
-    for (let j = doDontIndex; j < doDontEntries.length; j++) {
-      const { index: k, value } = doDontEntries[j];
-      if (k > index) {
-        doDontIndex = j;
-        break;
-      }
-      if (value === "don't()") {
-        ignored = true;
-      } else if (value === "do()") {
-        ignored = false;
-      }
-    }
-
-    if (!ignored) {
-      part2Values.push([+x, +y]);
-    }
-  }
-  for (let j = doDontIndex; j < doDontEntries.length; j++) {
-    const { value } = doDontEntries[j];
-    if (value === "don't()") {
-      ignored = true;
-    } else if (value === "do()") {
+  const matches = line.matchAll(/mul\((\d+),(\d+)\)|do\(\)|don't\(\)/g) || [];
+  for (const match of matches) {
+    const [command, x, y] = match.values();
+    if (command === "do()") {
       ignored = false;
+    } else if (command === "don't()") {
+      ignored = true;
+    } else {
+      part1Values.push([+x, +y]);
+      if (!ignored) part2Values.push([+x, +y]);
     }
   }
 });
 
 const part1 = () => {
-  const sum = part1Values.reduce((acc, [x, y]) => acc + x * y, 0);
-  return sum;
+  return part1Values.reduce((acc, [x, y]) => acc + x * y, 0);
 };
 
 const part2 = () => {
-  const sum = part2Values.reduce((acc, [x, y]) => acc + x * y, 0);
-  return sum;
+  return part2Values.reduce((acc, [x, y]) => acc + x * y, 0);
 };
 
 console.log("Part 1: ", part1());
