@@ -1,4 +1,4 @@
-import { readFile } from "../lib/file";
+import { readFile } from "../../lib/file";
 
 // part 1
 const leftList: number[] = [];

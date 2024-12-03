@@ -59,7 +59,7 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 
  */
-import { readFile } from "../lib/file";
+import { readFile } from "../../lib/file";
 
 const reports = readFile(import.meta.dir).map((line) =>
   line.split(/\s+/).map(Number)
