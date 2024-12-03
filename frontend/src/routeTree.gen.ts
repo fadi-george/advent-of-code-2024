@@ -10,85 +10,104 @@
 
 // Import Routes
 
-import { Route as rootRoute } from "./routes/__root";
-import { Route as IndexImport } from "./routes/index";
-import { Route as DaysDayImport } from "./routes/days/$day";
+import { Route as rootRoute } from './routes/__root'
+import { Route as IndexImport } from './routes/index'
+import { Route as YearIndexImport } from './routes/$year/index'
+import { Route as YearDaysDayImport } from './routes/$year/days/$day'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
-const DaysDayRoute = DaysDayImport.update({
-  id: "/days/$day",
-  path: "/days/$day",
+const YearIndexRoute = YearIndexImport.update({
+  id: '/$year/',
+  path: '/$year/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const YearDaysDayRoute = YearDaysDayImport.update({
+  id: '/$year/days/$day',
+  path: '/$year/days/$day',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/days/$day": {
-      id: "/days/$day";
-      path: "/days/$day";
-      fullPath: "/days/$day";
-      preLoaderRoute: typeof DaysDayImport;
-      parentRoute: typeof rootRoute;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/$year/': {
+      id: '/$year/'
+      path: '/$year'
+      fullPath: '/$year'
+      preLoaderRoute: typeof YearIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/$year/days/$day': {
+      id: '/$year/days/$day'
+      path: '/$year/days/$day'
+      fullPath: '/$year/days/$day'
+      preLoaderRoute: typeof YearDaysDayImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/days/$day": typeof DaysDayRoute;
+  '/': typeof IndexRoute
+  '/$year': typeof YearIndexRoute
+  '/$year/days/$day': typeof YearDaysDayRoute
 }
 
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/days/$day": typeof DaysDayRoute;
+  '/': typeof IndexRoute
+  '/$year': typeof YearIndexRoute
+  '/$year/days/$day': typeof YearDaysDayRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  "/": typeof IndexRoute;
-  "/days/$day": typeof DaysDayRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/$year/': typeof YearIndexRoute
+  '/$year/days/$day': typeof YearDaysDayRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/days/$day";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/days/$day";
-  id: "__root__" | "/" | "/days/$day";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/$year' | '/$year/days/$day'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/$year' | '/$year/days/$day'
+  id: '__root__' | '/' | '/$year/' | '/$year/days/$day'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  DaysDayRoute: typeof DaysDayRoute;
+  IndexRoute: typeof IndexRoute
+  YearIndexRoute: typeof YearIndexRoute
+  YearDaysDayRoute: typeof YearDaysDayRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DaysDayRoute: DaysDayRoute,
-};
+  YearIndexRoute: YearIndexRoute,
+  YearDaysDayRoute: YearDaysDayRoute,
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -97,14 +116,18 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/days/$day"
+        "/$year/",
+        "/$year/days/$day"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/days/$day": {
-      "filePath": "days/$day.tsx"
+    "/$year/": {
+      "filePath": "$year/index.tsx"
+    },
+    "/$year/days/$day": {
+      "filePath": "$year/days/$day.tsx"
     }
   }
 }

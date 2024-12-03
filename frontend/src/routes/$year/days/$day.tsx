@@ -1,26 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { getStarsQueryOptions } from "@/hooks/api";
+import { getInputsQueryOptions, getStarsQueryOptions } from "@/hooks/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { GiRoundStar } from "react-icons/gi";
 
-export const Route = createFileRoute("/days/$day")({
+export const Route = createFileRoute("/$year/days/$day")({
   component: RouteComponent,
   loader: async ({ params, context: { queryClient } }) => {
+    const year = params.year;
     const day = +params.day;
     if (day < 1 || day > 25) {
       throw redirect({ to: "/" });
     }
-    return queryClient.ensureQueryData(getStarsQueryOptions);
+    await queryClient.ensureQueryData(getStarsQueryOptions(year));
+    await queryClient.ensureQueryData(getInputsQueryOptions);
   },
 });
 
 function RouteComponent() {
-  const { data: stars } = useSuspenseQuery(getStarsQueryOptions);
+  const year = Route.useParams().year;
+  const { data: stars } = useSuspenseQuery(getStarsQueryOptions(year));
+  const { data: inputs } = useSuspenseQuery(getInputsQueryOptions);
+  console.log(inputs);
+
   const navigate = Route.useNavigate();
   const day = +Route.useParams().day;
   const dayStars = stars[day - 1];
