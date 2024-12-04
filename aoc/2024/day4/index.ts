@@ -109,7 +109,7 @@ export default (input: string) => {
         });
       }
     }
-    console.log(count);
+    console.log("part1", count);
   };
 
   const part2 = () => {
@@ -118,20 +118,62 @@ export default (input: string) => {
       let mCount = 0;
       let sCount = 0;
 
-      // corners
-      [
-        [i - 1, j - 1],
-        [i - 1, j + 1],
-        [i + 1, j - 1],
-        [i + 1, j + 1],
-      ].forEach(([x, y]) => {
-        if (!grid[x]) return;
-        if (!grid[x][y]) return;
-        if (grid[x][y] === "M") mCount++;
-        if (grid[x][y] === "S") sCount++;
-      });
+      // const c = [
+      //   [i - 1, j - 1], // top left
+      //   [i - 1, j + 1], // top right
+      //   [i + 1, j - 1], // bottom left
+      //   [i + 1, j + 1], // bottom right
+      // ];
+      const tl = [i - 1, j - 1];
+      const tr = [i - 1, j + 1];
+      const bl = [i + 1, j - 1];
+      const br = [i + 1, j + 1];
 
-      return mCount === 2 && sCount === 2;
+      if (
+        grid?.[tl[0]]?.[tl[1]] === "M" &&
+        grid?.[tr[0]]?.[tr[1]] === "S" &&
+        grid?.[bl[0]]?.[bl[1]] === "M" &&
+        grid?.[br[0]]?.[br[1]] === "S"
+      ) {
+        return true;
+      }
+
+      if (
+        grid?.[tl[0]]?.[tl[1]] === "M" &&
+        grid?.[tr[0]]?.[tr[1]] === "M" &&
+        grid?.[bl[0]]?.[bl[1]] === "S" &&
+        grid?.[br[0]]?.[br[1]] === "S"
+      ) {
+        return true;
+      }
+
+      if (
+        grid?.[tl[0]]?.[tl[1]] === "S" &&
+        grid?.[tr[0]]?.[tr[1]] === "M" &&
+        grid?.[bl[0]]?.[bl[1]] === "S" &&
+        grid?.[br[0]]?.[br[1]] === "M"
+      ) {
+        return true;
+      }
+
+      if (
+        grid?.[tl[0]]?.[tl[1]] === "S" &&
+        grid?.[tr[0]]?.[tr[1]] === "S" &&
+        grid?.[bl[0]]?.[bl[1]] === "M" &&
+        grid?.[br[0]]?.[br[1]] === "M"
+      ) {
+        return true;
+      }
+
+      return false;
+      // for (const [x, y] of corners) {
+      //   if (!grid[x]) return false;
+      //   if (!grid[x][y]) return false;
+      //   if (grid[x][y] === "M") mCount++;
+      //   if (grid[x][y] === "S") sCount++;
+      // }
+
+      // return mCount === 2 && sCount === 2;
     };
 
     for (let i = 0; i < grid.length; i++) {
@@ -142,7 +184,7 @@ export default (input: string) => {
         }
       }
     }
-    console.log(count);
+    console.log("part2", count);
   };
 
   return {
@@ -150,3 +192,5 @@ export default (input: string) => {
     part2: part2(),
   };
 };
+
+// 1949 - wrong
