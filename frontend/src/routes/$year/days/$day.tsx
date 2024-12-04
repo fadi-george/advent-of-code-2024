@@ -64,7 +64,7 @@ function RouteComponent() {
       <span className="flex items-center gap-1 ">
         <Button
           variant="ghost"
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => navigate({ to: "../.." })}
           size="icon"
           className="ml-[-10px] leading-none"
         >

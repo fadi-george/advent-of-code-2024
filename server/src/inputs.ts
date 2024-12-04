@@ -33,13 +33,13 @@ export const inputsRoute = new Hono()
         };
       };
 
-      const start = performance.now();
+      const start = Bun.nanoseconds();
       const res = run(input);
-      const end = performance.now();
+      const end = Bun.nanoseconds();
 
       return c.json({
         ...res,
-        runTime: end - start,
+        runTime: (end - start) / 1e6,
       });
     }
 
