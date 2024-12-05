@@ -17,6 +17,17 @@ Create a `txt` file in the `aoc/2024/day<some-number>` folder. If the file is na
 FILE=input YEAR=2024 DAY=1 bun aoc/index.ts
 ```
 
+Bun version: 1.1.36 is recommended for debugging.
+
+Can run the "Bun Debug AoC" launch config to run the CLI with debugging enabled.
+This will require setting the `FILE`, `YEAR`, and `DAY` in a `.env` file in the `aoc` folder. E.g.
+
+```
+FILE=sample.txt
+YEAR=2024
+DAY=1
+```
+
 ### Webp App + Server
 
 Create an `.env` file in the server folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.

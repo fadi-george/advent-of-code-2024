@@ -1,0 +1,42 @@
+// Use IntelliSense to learn about possible attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+{
+  "configurations": [
+    {
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/server/src/index.ts",
+      "request": "launch",
+      "runtimeArgs": ["--env-file", "${workspaceFolder}/server/.env"],
+      "type": "bun"
+    },
+    {
+      "name": "Chrome",
+      "port": 3000,
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Bun Debug AoC",
+      "program": "${workspaceFolder}/aoc/index.ts",
+      "request": "launch",
+      "runtimeArgs": ["--env-file", "${workspaceFolder}/aoc/.env"],
+      "type": "bun"
+    },
+    {
+      "name": "Node Debug AoC",
+      "program": "${workspaceFolder}/aoc/index.ts",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "runtimeArgs": [
+        "--experimental-strip-types",
+        "--env-file",
+        "${workspaceFolder}/aoc/.env"
+      ]
+    }
+  ],
+  "version": "0.2.0"
+}
