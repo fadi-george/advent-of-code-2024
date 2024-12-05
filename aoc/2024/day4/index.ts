@@ -1,6 +1,5 @@
 export default (input: string) => {
-  const grid = input.split("\n").map((line) => line);
-
+  const grid = input.split("\n");
   let p1Count = 0;
   let p2Count = 0;
 
