@@ -2,8 +2,8 @@
 
 Solutions written in Typescript.
 
-<img width="1912" alt="Screenshot 2024-12-04 at 10 36 14 PM" src="https://github.com/user-attachments/assets/46bd6ca2-7fce-4be1-bfa0-f5affe0d667e">
-<img width="1912" alt="Screenshot 2024-12-01 at 12 50 09 AM" src="https://github.com/user-attachments/assets/c4a1abc5-335b-4a98-8419-714c63523201">
+<img width="1912" alt="Screenshot 2024-12-05 at 11 02 13 AM" src="https://github.com/user-attachments/assets/91a5bafc-3908-4819-9b9f-df62374461fe">
+<img width="1912" alt="Screenshot 2024-12-05 at 11 02 25 AM" src="https://github.com/user-attachments/assets/45ae8a28-b33e-4030-ba9e-facbd2f5eb2c">
 
 ## Running
 
