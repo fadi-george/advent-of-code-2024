@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getInputsQueryOptions, getStarsQueryOptions } from "@/hooks/api";
+import { useToast } from "@/hooks/use-toast";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -167,6 +168,7 @@ const SubmitButton = ({
   solution: { part1: string; part2: string };
   year: string;
 }) => {
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>("");
   const [delay, setDelay] = useState<number | null>(null);
 
@@ -186,6 +188,11 @@ const SubmitButton = ({
         method: "POST",
         body: JSON.stringify({ level, answer }),
       }).then((res) => {
+        toast({
+          variant: "destructive",
+          title: "Error submitting answer",
+          description: "Failed to submit answer",
+        });
         if (!res.ok) {
           throw new Error("Failed to submit answer");
         }

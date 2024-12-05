@@ -32,7 +32,7 @@ function RouteComponent() {
       </h1>
       <div className="grid grid-cols-5 gap-4 mt-8">
         {stars.map((stars, day) => {
-          return <DayCard key={day} stars={stars} day={day} year={+year} />;
+          return <DayCard key={day} stars={stars} day={day} />;
         })}
       </div>
     </div>
@@ -67,15 +67,7 @@ const YearDropdown = ({ year }: { year: number }) => {
   );
 };
 
-const DayCard = ({
-  stars,
-  day,
-  year,
-}: {
-  stars: number;
-  day: number;
-  year: number;
-}) => {
+const DayCard = ({ stars, day }: { stars: number; day: number }) => {
   const getStars = () => {
     const GoldStar = <GiRoundStar className="text-yellow-400" />;
     const RegStar = <GiRoundStar className="opacity-15" />;
