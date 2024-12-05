@@ -3,11 +3,11 @@ const findMiddleItem = (arr: any[]) => arr[arr.length >> 1];
 export default (input: string) => {
   const [rules, updates] = input.split("\n\n");
 
-  const collections: Record<string, Set<string>> = {};
+  const collections = new Map<string, Set<string>>();
   rules.split("\n").forEach((rule) => {
     const [p1, p2] = rule.split("|");
-    if (!collections[p1]) collections[p1] = new Set();
-    collections[p1].add(p2);
+    if (!collections.has(p1)) collections.set(p1, new Set());
+    collections.get(p1)!.add(p2);
   });
 
   const updatesTable: string[][] = [];
@@ -19,7 +19,7 @@ export default (input: string) => {
   for (const updates of updatesTable) {
     let isValid = true;
     const orderedUpdates = updates.toSorted((a, b) => {
-      if (collections[a]?.has(b)) {
+      if (collections.get(a)?.has(b)) {
         isValid = false;
         return -1;
       }
