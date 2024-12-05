@@ -26,6 +26,8 @@ enum InputTab {
   Custom = "custom",
 }
 
+const MAX_STARS = 2;
+
 function RouteComponent() {
   const { day, year } = Route.useParams();
 
@@ -47,6 +49,7 @@ function RouteComponent() {
   });
 
   const userText = inputTab === InputTab.Custom ? input : inputText;
+
   const runSolution = async () => {
     setIsRunning(true);
     const result = await fetch(`/api/inputs/${year}/${day}?type=js`, {
@@ -56,6 +59,17 @@ function RouteComponent() {
     setIsRunning(false);
 
     setSolution(result);
+  };
+
+  const handleSubmit = async () => {
+    const level = dayStars === 0 ? "1" : "2";
+    const answer = level === "1" ? solution.part1 : solution.part2;
+
+    const result = await fetch(`/api/answer/${year}/${day}`, {
+      method: "POST",
+      body: JSON.stringify({ level, answer }),
+    }).then((res) => res.json());
+    console.log(result);
   };
 
   return (
@@ -121,15 +135,25 @@ function RouteComponent() {
             </div>
           </div>
 
-          <Button
-            className="mt-4"
-            disabled={isRunning}
-            onClick={() => {
-              runSolution();
-            }}
-          >
-            {isRunning ? "Running..." : "Run"}
-          </Button>
+          <div className="mt-4 flex gap-3">
+            <Button
+              disabled={isRunning}
+              onClick={() => {
+                runSolution();
+              }}
+            >
+              {isRunning ? "Running..." : "Run"}
+            </Button>
+            {dayStars !== MAX_STARS && (
+              <Button
+                className="bg-green-600"
+                disabled={!solution.part1 || !solution.part2}
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
