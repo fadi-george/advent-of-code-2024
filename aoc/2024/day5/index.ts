@@ -1,77 +1,50 @@
-const findMiddleItem = (arr: string[]) => {
-  return arr[arr.length >> 1];
+const findMiddleItem = (arr: unknown[]) => arr[arr.length >> 1];
+const sumMiddleItems = (arr: string[][]) => {
+  const middleItems = arr.map(findMiddleItem).map(Number);
+  return middleItems.sum();
 };
 
 export default (input: string) => {
   const [rules, updates] = input.split("\n\n");
 
-  const collections: Record<string, string[]> = {};
+  const collections: Record<string, Set<string>> = {};
   rules.split("\n").forEach((rule) => {
     const [p1, p2] = rule.split("|");
-    if (!collections[p1]) collections[p1] = [];
-    collections[p1].push(p2);
+    if (!collections[p1]) collections[p1] = new Set();
+    collections[p1].add(p2);
   });
 
-  const pages: string[][] = [];
-  updates.split("\n").forEach((update) => {
-    pages.push(update.split(","));
-  });
+  const updatesTable: string[][] = [];
+  updates.split("\n").forEach((update) => updatesTable.push(update.split(",")));
 
   const validUpdates: string[][] = [];
-  const invalidUpdates: string[][] = [];
-  let i = 0;
-  for (const pageArr of pages) {
+  const modifiedUpdates: string[][] = [];
+
+  for (const updates of updatesTable) {
     let pageSet = new Set<string>();
+    let orderedPages: string[] = [];
     let isValid = true;
 
-    for (const page of pageArr) {
+    for (const page of updates) {
       const pageCollection = collections[page];
-      if (pageCollection?.some((p) => pageSet.has(p))) {
-        isValid = false;
-        continue;
+
+      if (pageCollection) {
+        if (isValid && pageSet.intersection(pageCollection).size > 0)
+          isValid = false;
+
+        const pIndex = orderedPages.findIndex((p) => pageCollection.has(p));
+        if (pIndex !== -1) orderedPages.splice(pIndex, 0, page);
+        else orderedPages.push(page);
       }
       pageSet.add(page);
     }
 
-    if (isValid) {
-      validUpdates.push(pageArr);
-    } else {
-      invalidUpdates.push(pageArr);
-    }
-    i++;
+    if (isValid) validUpdates.push(updates);
+    else modifiedUpdates.push(orderedPages);
   }
 
-  // part 1
-  const middleItems = validUpdates.map(findMiddleItem).map(Number);
-  const sum = middleItems.sum();
-
-  // part 2
-  console.log({
-    collections,
-  });
-  const modifiedUpdates: string[][] = [];
-  invalidUpdates.forEach((updateArr) => {
-    const pageSet: string[] = [];
-    for (let i = 0; i < updateArr.length; i++) {
-      const page = updateArr[i];
-      const pageCollection = collections[page];
-      const pIndex = pageCollection?.findIndex((p) => pageSet.includes(p));
-      if (pIndex !== undefined && pIndex !== -1) {
-        const _page = pageCollection[pIndex];
-        const j = pageSet.findIndex((p) => _page === p);
-        if (j !== -1) {
-          pageSet.splice(j, 0, page);
-        }
-      } else {
-        pageSet.push(page);
-      }
-    }
-    modifiedUpdates.push(pageSet);
-  });
-
-  console.log(modifiedUpdates);
   return {
-    part1: sum,
-    part2: "p2",
+    part1: sumMiddleItems(validUpdates),
+    part2: sumMiddleItems(modifiedUpdates),
   };
 };
