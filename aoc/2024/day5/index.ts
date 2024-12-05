@@ -4,13 +4,12 @@ const findMiddleItem = (arr: string[]) => {
 
 export default (input: string) => {
   const [rules, updates] = input.split("\n\n");
-  console.log({ rules, updates });
 
-  const collections: Record<string, Set<string>> = {};
+  const collections: Record<string, string[]> = {};
   rules.split("\n").forEach((rule) => {
     const [p1, p2] = rule.split("|");
-    if (!collections[p1]) collections[p1] = new Set();
-    collections[p1].add(p2);
+    if (!collections[p1]) collections[p1] = [];
+    collections[p1].push(p2);
   });
 
   const pages: string[][] = [];
@@ -18,9 +17,8 @@ export default (input: string) => {
     pages.push(update.split(","));
   });
 
-  console.log({ collections, pages });
-
   const validUpdates: string[][] = [];
+  const invalidUpdates: string[][] = [];
   let i = 0;
   for (const pageArr of pages) {
     let pageSet = new Set<string>();
@@ -28,7 +26,7 @@ export default (input: string) => {
 
     for (const page of pageArr) {
       const pageCollection = collections[page];
-      if (pageCollection && [...pageCollection].some((p) => pageSet.has(p))) {
+      if (pageCollection?.some((p) => pageSet.has(p))) {
         isValid = false;
         continue;
       }
@@ -37,28 +35,41 @@ export default (input: string) => {
 
     if (isValid) {
       validUpdates.push(pageArr);
+    } else {
+      invalidUpdates.push(pageArr);
     }
     i++;
   }
 
+  // part 1
   const middleItems = validUpdates.map(findMiddleItem).map(Number);
   const sum = middleItems.sum();
-  console.log({ middleItems, sum });
 
-  // const pageSet = new Set(pages[0]);
-  // const validUpdates: string[] = [];
+  // part 2
+  console.log({
+    collections,
+  });
+  const modifiedUpdates: string[][] = [];
+  invalidUpdates.forEach((updateArr) => {
+    const pageSet: string[] = [];
+    for (let i = 0; i < updateArr.length; i++) {
+      const page = updateArr[i];
+      const pageCollection = collections[page];
+      const pIndex = pageCollection?.findIndex((p) => pageSet.includes(p));
+      if (pIndex !== undefined && pIndex !== -1) {
+        const _page = pageCollection[pIndex];
+        const j = pageSet.findIndex((p) => _page === p);
+        if (j !== -1) {
+          pageSet.splice(j, 0, page);
+        }
+      } else {
+        pageSet.push(page);
+      }
+    }
+    modifiedUpdates.push(pageSet);
+  });
 
-  // for (let i = 1; i < pages.length; i++) {
-  //   const page = pages[i];
-  //   const pageCollection = collections[page];
-  //   if (pageCollection.has(page)) {
-  //     continue;
-  //   }
-  //   // const prevPageIndex = prevPage.indexOf(page);
-  //   // const nextPageIndex = prevPageIndex + 1;
-  //   // prevPage = prevPage.slice(nextPageIndex) + page;
-  // }
-
+  console.log(modifiedUpdates);
   return {
     part1: sum,
     part2: "p2",
