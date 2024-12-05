@@ -1,9 +1,4 @@
-const findMiddleItem = (arr: unknown[]) => arr[arr.length >> 1];
-
-const sumMiddleItems = (arr: string[][]) => {
-  const middleItems = arr.map(findMiddleItem).map(Number);
-  return middleItems.sum();
-};
+const findMiddleItem = (arr: any[]) => arr[arr.length >> 1];
 
 export default (input: string) => {
   const [rules, updates] = input.split("\n\n");
@@ -18,8 +13,8 @@ export default (input: string) => {
   const updatesTable: string[][] = [];
   updates.split("\n").forEach((update) => updatesTable.push(update.split(",")));
 
-  const validUpdates: string[][] = [];
-  const modifiedUpdates: string[][] = [];
+  let p1Sum = 0;
+  let p2Sum = 0;
 
   for (const updates of updatesTable) {
     let isValid = true;
@@ -30,12 +25,13 @@ export default (input: string) => {
       }
       return 0;
     });
-    if (isValid) validUpdates.push(updates);
-    else modifiedUpdates.push(orderedUpdates);
+
+    if (isValid) p1Sum += +findMiddleItem(orderedUpdates);
+    else p2Sum += +findMiddleItem(orderedUpdates);
   }
 
   return {
-    part1: sumMiddleItems(validUpdates),
-    part2: sumMiddleItems(modifiedUpdates),
+    part1: p1Sum,
+    part2: p2Sum,
   };
 };
