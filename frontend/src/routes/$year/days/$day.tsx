@@ -139,8 +139,9 @@ function RouteComponent() {
             </div>
           </div>
 
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-col gap-3">
             <Button
+              className="w-full"
               disabled={isRunning}
               onClick={() => {
                 runSolution();
@@ -150,11 +151,11 @@ function RouteComponent() {
             </Button>
             {dayStars !== MAX_STARS && (
               <Button
-                className="bg-green-600"
+                className="bg-green-600 w-full"
                 disabled={!solution.part1 || !solution.part2 || isRunning}
                 onClick={handleSubmit}
               >
-                Submit
+                Submit Part {dayStars === 1 ? "2" : "1"}
               </Button>
             )}
           </div>
