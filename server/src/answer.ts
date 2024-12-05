@@ -25,10 +25,31 @@ export const answerRoute = new Hono().post("/:year/:day", async (c) => {
   if (document.body.textContent?.includes("That's not the right answer")) {
     return c.json({
       success: false,
-    });
-  } else if (document.body.textContent?.includes("That's the right answer!")) {
-    return c.json({
-      success: true,
+      type: "incorrect",
     });
   }
+  if (document.body.textContent?.includes("That's the right answer!")) {
+    return c.json({
+      success: true,
+      type: "correct",
+    });
+  }
+  // answered too quickly
+  if (document.body.textContent?.includes("You gave an answer too recently")) {
+    const match = document.body.textContent?.match(
+      /You have (?:(\d+)m\s*)?(\d+)s left to wait/
+    );
+    const minutes = match?.[1] ? parseInt(match[1]) : 0;
+    const seconds = match?.[2] ? parseInt(match[2]) : 0;
+    return c.json({
+      success: false,
+      type: "delay",
+      waitTime: minutes * 60 + seconds,
+    });
+  }
+
+  return c.json({
+    success: false,
+    type: "unknown",
+  });
 });

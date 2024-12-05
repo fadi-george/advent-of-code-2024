@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getInputsQueryOptions, getStarsQueryOptions } from "@/hooks/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { GiRoundStar } from "react-icons/gi";
 
@@ -43,6 +43,7 @@ function RouteComponent() {
 
   const [inputTab, setInputTab] = useState(InputTab.Input);
   const [input, setInput] = useState("");
+
   const [isRunning, setIsRunning] = useState(false);
   const [solution, setSolution] = useState({
     part1: "",
@@ -61,19 +62,6 @@ function RouteComponent() {
     setIsRunning(false);
 
     setSolution(result);
-  };
-
-  const handleSubmit = async () => {
-    const level = dayStars === 1 ? "2" : "1";
-    const answer = level === "2" ? solution.part2 : solution.part1;
-
-    const result = await fetch(`/api/answer/${year}/${day}`, {
-      method: "POST",
-      body: JSON.stringify({ level, answer }),
-    }).then((res) => res.json());
-    if (result.success) {
-      refetchStars();
-    }
   };
 
   return (
@@ -149,18 +137,102 @@ function RouteComponent() {
             >
               {isRunning ? "Running..." : "Run"}
             </Button>
-            {dayStars !== MAX_STARS && (
-              <Button
-                className="bg-green-600 w-full"
-                disabled={!solution.part1 || !solution.part2 || isRunning}
-                onClick={handleSubmit}
-              >
-                Submit Part {dayStars === 1 ? "2" : "1"}
-              </Button>
-            )}
+            <SubmitButton
+              day={day}
+              dayStars={dayStars}
+              refetchStars={refetchStars}
+              inputTab={inputTab}
+              solution={solution}
+              year={year}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+const SubmitButton = ({
+  day,
+  dayStars,
+  refetchStars,
+  inputTab,
+  solution,
+  year,
+}: {
+  day: string;
+  dayStars: number;
+  inputTab: InputTab;
+  refetchStars: () => void;
+  solution: { part1: string; part2: string };
+  year: string;
+}) => {
+  const [error, setError] = useState<string | null>("");
+  const [delay, setDelay] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (delay) {
+      setTimeout(() => setDelay(null), delay * 1000);
+    }
+  }, [delay]);
+
+  const handleSubmit = async () => {
+    const level = dayStars === 1 ? "2" : "1";
+    const answer = level === "2" ? solution.part2 : solution.part1;
+
+    setError(null);
+    try {
+      const result = await fetch(`/api/answer/${year}/${day}`, {
+        method: "POST",
+        body: JSON.stringify({ level, answer }),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to submit answer");
+        }
+        return res.json();
+      });
+      if (result.success) {
+        refetchStars();
+      } else {
+        switch (result.type) {
+          case "incorrect":
+            setError("Incorrect answer");
+            break;
+          case "unknown":
+            setError("Failed to submit answer");
+            break;
+          case "delay":
+            setError("Answered too quickly");
+            setDelay(result.waitTime);
+            break;
+        }
+      }
+    } catch {
+      setError("Error submitting answer");
+    }
+  };
+
+  const disabled =
+    inputTab !== InputTab.Input ||
+    !solution.part1 ||
+    !solution.part2 ||
+    delay !== null;
+  return (
+    <>
+      {dayStars !== MAX_STARS && (
+        <span>
+          {error && (
+            <p className="text-red-500 text-sm text-center pb-1">{error}</p>
+          )}
+          <Button
+            className="bg-green-600 w-full"
+            disabled={disabled}
+            onClick={handleSubmit}
+          >
+            Submit Part {dayStars === 1 ? "2" : "1"}
+          </Button>
+        </span>
+      )}
+    </>
+  );
+};
