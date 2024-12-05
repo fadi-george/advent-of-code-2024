@@ -1,4 +1,5 @@
 const findMiddleItem = (arr: unknown[]) => arr[arr.length >> 1];
+
 const sumMiddleItems = (arr: string[][]) => {
   const middleItems = arr.map(findMiddleItem).map(Number);
   return middleItems.sum();
@@ -21,7 +22,6 @@ export default (input: string) => {
   const modifiedUpdates: string[][] = [];
 
   for (const updates of updatesTable) {
-    let pageSet = new Set<string>();
     let orderedPages: string[] = [];
     let isValid = true;
 
@@ -29,14 +29,14 @@ export default (input: string) => {
       const pageCollection = collections[page];
 
       if (pageCollection) {
-        if (isValid && pageSet.intersection(pageCollection).size > 0)
-          isValid = false;
-
         const pIndex = orderedPages.findIndex((p) => pageCollection.has(p));
-        if (pIndex !== -1) orderedPages.splice(pIndex, 0, page);
-        else orderedPages.push(page);
+        if (pIndex !== -1) {
+          isValid = false;
+          orderedPages.splice(pIndex, 0, page);
+          continue;
+        }
       }
-      pageSet.add(page);
+      orderedPages.push(page);
     }
 
     if (isValid) validUpdates.push(updates);
