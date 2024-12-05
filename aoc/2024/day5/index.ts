@@ -22,25 +22,16 @@ export default (input: string) => {
   const modifiedUpdates: string[][] = [];
 
   for (const updates of updatesTable) {
-    let orderedPages: string[] = [];
     let isValid = true;
-
-    for (const page of updates) {
-      const pageCollection = collections[page];
-
-      if (pageCollection) {
-        const pIndex = orderedPages.findIndex((p) => pageCollection.has(p));
-        if (pIndex !== -1) {
-          isValid = false;
-          orderedPages.splice(pIndex, 0, page);
-          continue;
-        }
+    const orderedUpdates = updates.toSorted((a, b) => {
+      if (collections[a]?.has(b)) {
+        isValid = false;
+        return -1;
       }
-      orderedPages.push(page);
-    }
-
+      return 0;
+    });
     if (isValid) validUpdates.push(updates);
-    else modifiedUpdates.push(orderedPages);
+    else modifiedUpdates.push(orderedUpdates);
   }
 
   return {
