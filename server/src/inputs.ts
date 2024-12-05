@@ -19,29 +19,25 @@ export const inputsRoute = new Hono()
   .post("/:year/:day", async (c) => {
     const year = c.req.param("year");
     const day = c.req.param("day");
-    const query = c.req.query("type") ?? "js";
+    // const query = c.req.query("type") ?? "js";
 
     const { input } = await c.req.json();
 
-    if (query === "js") {
-      const { default: run } = (await import(
-        `../../aoc/${year}/day${day}/index.ts`
-      )) as {
-        default: (input: string) => {
-          part1: string;
-          part2: string;
-        };
+    const { default: run } = (await import(
+      `../../aoc/${year}/day${day}/index.ts`
+    )) as {
+      default: (input: string) => {
+        part1: string;
+        part2: string;
       };
+    };
 
-      const start = Bun.nanoseconds();
-      const res = run(input);
-      const end = Bun.nanoseconds();
+    const start = Bun.nanoseconds();
+    const res = run(input);
+    const end = Bun.nanoseconds();
 
-      return c.json({
-        ...res,
-        runTime: (end - start) / 1e6,
-      });
-    }
-
-    return c.text("test");
+    return c.json({
+      ...res,
+      runTime: (end - start) / 1e6,
+    });
   });

@@ -31,7 +31,9 @@ const MAX_STARS = 2;
 function RouteComponent() {
   const { day, year } = Route.useParams();
 
-  const { data: stars } = useSuspenseQuery(getStarsQueryOptions(year));
+  const { data: stars, refetch: refetchStars } = useSuspenseQuery(
+    getStarsQueryOptions(year)
+  );
   const { data: inputText } = useSuspenseQuery(
     getInputsQueryOptions(year, day)
   );
@@ -62,14 +64,16 @@ function RouteComponent() {
   };
 
   const handleSubmit = async () => {
-    const level = dayStars === 0 ? "1" : "2";
-    const answer = level === "1" ? solution.part1 : solution.part2;
+    const level = dayStars === 1 ? "2" : "1";
+    const answer = level === "2" ? solution.part2 : solution.part1;
 
     const result = await fetch(`/api/answer/${year}/${day}`, {
       method: "POST",
       body: JSON.stringify({ level, answer }),
     }).then((res) => res.json());
-    console.log(result);
+    if (result.success) {
+      refetchStars();
+    }
   };
 
   return (
@@ -147,7 +151,7 @@ function RouteComponent() {
             {dayStars !== MAX_STARS && (
               <Button
                 className="bg-green-600"
-                disabled={!solution.part1 || !solution.part2}
+                disabled={!solution.part1 || !solution.part2 || isRunning}
                 onClick={handleSubmit}
               >
                 Submit
