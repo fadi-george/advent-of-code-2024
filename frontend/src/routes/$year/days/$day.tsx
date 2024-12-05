@@ -169,20 +169,20 @@ const SubmitButton = ({
   year: string;
 }) => {
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>("");
   const [delay, setDelay] = useState<number | null>(null);
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (delay) {
-      setTimeout(() => setDelay(null), delay * 1000);
+      timeout = setTimeout(() => setDelay(null), delay * 1000);
     }
+    return () => clearTimeout(timeout);
   }, [delay]);
 
   const handleSubmit = async () => {
     const level = dayStars === 1 ? "2" : "1";
     const answer = level === "2" ? solution.part2 : solution.part1;
 
-    setError(null);
     try {
       const result = await fetch(`/api/answer/${year}/${day}`, {
         method: "POST",
@@ -199,23 +199,39 @@ const SubmitButton = ({
         return res.json();
       });
       if (result.success) {
+        toast({
+          variant: "default",
+          description: "That's the right answer!",
+        });
         refetchStars();
       } else {
         switch (result.type) {
           case "incorrect":
-            setError("Incorrect answer");
+            toast({
+              variant: "destructive",
+              description: "That's not the right answer",
+            });
             break;
           case "unknown":
-            setError("Failed to submit answer");
+            toast({
+              variant: "destructive",
+              description: "Failed to submit answer",
+            });
             break;
           case "delay":
-            setError("Answered too quickly");
+            toast({
+              variant: "destructive",
+              description: "Answered too quickly",
+            });
             setDelay(result.waitTime);
             break;
         }
       }
     } catch {
-      setError("Error submitting answer");
+      toast({
+        variant: "destructive",
+        description: "Error submitting answer",
+      });
     }
   };
 
@@ -227,18 +243,13 @@ const SubmitButton = ({
   return (
     <>
       {dayStars !== MAX_STARS && (
-        <span>
-          {error && (
-            <p className="text-red-500 text-sm text-center pb-1">{error}</p>
-          )}
-          <Button
-            className="bg-green-600 w-full"
-            disabled={disabled}
-            onClick={handleSubmit}
-          >
-            Submit Part {dayStars === 1 ? "2" : "1"}
-          </Button>
-        </span>
+        <Button
+          className="bg-green-600 w-full"
+          disabled={disabled}
+          onClick={handleSubmit}
+        >
+          Submit Part {dayStars === 1 ? "2" : "1"}
+        </Button>
       )}
     </>
   );
