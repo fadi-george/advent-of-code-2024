@@ -21,16 +21,16 @@ export default (input: string) => {
 
   const traverse = (checkForLoop = false) => {
     let [r, c, dir] = [startI, startJ, Direction.Up];
-    const visitedMap = new Map<number, number>();
+    const visitedMap = new Set<number>();
 
     while (r >= 0 && r < grid.length && c >= 0 && c < width) {
       const next = getNext(r, c, dir);
       const nextChar = grid[next.r]?.[next.c];
 
       if (checkForLoop) {
-        const key = get1DIndex(next.r, next.c, width);
-        if (visitedMap.get(key) === dir) return true;
-        visitedMap.set(key, dir);
+        const key = (get1DIndex(next.r, next.c, width) << 2) | dir;
+        if (visitedMap.has(key)) return true;
+        visitedMap.add(key);
       }
 
       if (nextChar === undefined) break;
