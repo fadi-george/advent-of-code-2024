@@ -8,93 +8,54 @@ enum Direction {
 }
 
 export default (input: string) => {
-  const grid: string[] = [];
-  input.split("\n").forEach((l) => grid.push(l));
-
-  // find guard position
+  const grid = input.split("\n");
   const startI = grid.findIndex((line) => line.includes("^"));
   const startJ = grid[startI].indexOf("^");
-  let dir = Direction.Up;
-
-  const getNext = (r: number, c: number, d: Direction) => {
-    switch (d) {
-      case Direction.Up:
-        return { r: r - 1, c };
-      case Direction.Right:
-        return { r, c: c + 1 };
-      case Direction.Down:
-        return { r: r + 1, c };
-      case Direction.Left:
-        return { r, c: c - 1 };
-    }
-  };
-
   const width = grid[0].length;
   const visited = new Set<number>();
 
-  const countPositions = () => {
-    let gR = startI;
-    let gC = startJ;
-    while (gR >= 0 && gR < grid.length && gC >= 0 && gC < grid[gR].length) {
-      // next step
-      const next = getNext(gR, gC, dir);
+  const getNext = (r: number, c: number, d: Direction) => ({
+    r: r + [-1, 0, 1, 0][d],
+    c: c + [0, 1, 0, -1][d],
+  });
 
+  const traverse = (checkForLoop = false) => {
+    let [r, c, dir] = [startI, startJ, Direction.Up];
+    const visited2 = new Set<string>();
+
+    while (r >= 0 && r < grid.length && c >= 0 && c < width) {
+      const next = getNext(r, c, dir);
       const nextChar = grid[next.r]?.[next.c];
-      if (nextChar === "#") {
-        // turn right
-        dir = (dir + 1) % 4;
-      } else {
-        if (nextChar !== undefined)
-          visited.add(get1DIndex(next.r, next.c, width));
-        gR = next.r;
-        gC = next.c;
+
+      if (checkForLoop) {
+        const key = `${get1DIndex(next.r, next.c, width)},${dir}`;
+        if (visited2.has(key)) return true;
+        visited2.add(key);
       }
-    }
-  };
 
-  countPositions();
-
-  const checkLoop = () => {
-    let gR = startI;
-    let gC = startJ;
-    let dir = Direction.Up;
-    let visited2 = new Set<string>();
-
-    while (gR >= 0 && gR < grid.length && gC >= 0 && gC < grid[0].length) {
-      const next = getNext(gR, gC, dir);
-      const nextChar = grid[next.r]?.[next.c];
-
-      if (visited2.has(get1DIndex(next.r, next.c, width) + "," + dir))
-        return true;
-      visited2.add(get1DIndex(next.r, next.c, width) + "," + dir);
-
+      if (nextChar === undefined) break;
       if (nextChar === "#" || nextChar === "O") {
         dir = (dir + 1) % 4;
       } else {
-        gR = next.r;
-        gC = next.c;
+        if (!checkForLoop) visited.add(get1DIndex(next.r, next.c, width));
+        [r, c] = [next.r, next.c];
       }
     }
     return false;
   };
 
-  let p2Count = 0;
+  traverse();
 
+  let p2Count = 0;
   [...visited].forEach((index) => {
     const [rr, cc] = get2DIndex(index, width);
-
-    const originalRow = grid[rr].slice(0);
     if (rr === startI && cc === startJ) return;
-    grid[rr] = grid[rr].slice(0, cc) + "O" + grid[rr].slice(cc + 1);
-    if (checkLoop()) {
-      p2Count++;
-    }
 
-    grid[rr] = originalRow;
+    const originalChar = grid[rr][cc];
+    grid[rr] = grid[rr].slice(0, cc) + "O" + grid[rr].slice(cc + 1);
+    if (traverse(true)) p2Count++;
+    grid[rr] = grid[rr].slice(0, cc) + originalChar + grid[rr].slice(cc + 1);
   });
 
-  return {
-    part1: visited.size,
-    part2: p2Count,
-  };
+  return { part1: visited.size, part2: p2Count };
 };
