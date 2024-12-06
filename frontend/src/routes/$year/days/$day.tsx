@@ -239,11 +239,7 @@ const SubmitButton = ({
     }
   };
 
-  const disabled =
-    inputTab !== InputTab.Input ||
-    !solution.part1 ||
-    !solution.part2 ||
-    delay !== null;
+  const disabled = inputTab !== InputTab.Input || delay !== null;
   return (
     <>
       {dayStars !== MAX_STARS && (
