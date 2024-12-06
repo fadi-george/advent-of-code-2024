@@ -17,6 +17,9 @@ export default (input: string) => {
   let dir = Direction.Up;
   let visited = new Set<string>();
 
+  const sGI = gI;
+  const sGJ = gJ;
+
   const rowCol2Index = (r: number, c: number) => `${r},${c}`;
 
   const getNext = (r: number, c: number, d: Direction) => {
@@ -33,7 +36,6 @@ export default (input: string) => {
   };
 
   while (gI >= 0 && gI < grid.length && gJ >= 0 && gJ < grid[gI].length) {
-    const current = grid[gI][gJ];
     // next step
     const next = getNext(gI, gJ, dir);
 
@@ -48,11 +50,58 @@ export default (input: string) => {
     }
   }
 
-  const p1 = "";
-  const p2 = "";
+  // // find loops
+  let rr;
+  let cc;
+
+  const checkLoop = () => {
+    let gR = sGI;
+    let gC = sGJ;
+    let dir = Direction.Up;
+    let visited2 = new Set<string>();
+
+    while (gR >= 0 && gR < grid.length && gC >= 0 && gC < grid[0].length) {
+      // console.log({ rr, cc, gR, gC });
+      // console.log({ rr, cc, gR, gC });
+      const next = getNext(gR, gC, dir);
+      const nextChar = grid[next.r]?.[next.c];
+
+      // if (nextChar === "O") {
+      //   if (visited2.has(rowCol2Index(next.r, next.c) + "," + dir)) return true;
+      //   else visited2.add(rowCol2Index(next.r, next.c) + "," + dir);
+      // }
+      if (visited2.has(rowCol2Index(next.r, next.c) + "," + dir)) return true;
+      // if (nextChar !== undefined)
+      visited2.add(rowCol2Index(next.r, next.c) + "," + dir);
+
+      if (nextChar === "#" || nextChar === "O") {
+        // turn right
+        dir = (dir + 1) % 4;
+      } else {
+        gR = next.r;
+        gC = next.c;
+      }
+    }
+    return false;
+  };
+
+  let p2Count = 0;
+
+  [...visited].forEach((index) => {
+    [rr, cc] = index.split(",").map(Number);
+
+    const originalRow = grid[rr].slice(0);
+    if (rr === sGI && cc === sGJ) return;
+    grid[rr] = grid[rr].slice(0, cc) + "O" + grid[rr].slice(cc + 1);
+    if (checkLoop()) {
+      p2Count++;
+    }
+
+    grid[rr] = originalRow;
+  });
 
   return {
     part1: visited.size,
-    part2: p2,
+    part2: p2Count,
   };
 };
