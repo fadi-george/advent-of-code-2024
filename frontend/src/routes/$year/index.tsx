@@ -27,10 +27,10 @@ function RouteComponent() {
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center ">
-      <h1 className="text-4xl font-bold">
+      <h1 className="sm:text-4xl text-2xl font-bold">
         🎄 Advent of Code <YearDropdown year={+year} /> 🎄
       </h1>
-      <div className="grid grid-cols-5 gap-4 mt-8">
+      <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(108px,1fr))] grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-4 mt-8 max-w-[608px] w-full">
         {stars.map((stars, day) => {
           return <DayCard key={day} stars={stars} day={day} />;
         })}
@@ -99,10 +99,10 @@ const DayCard = ({ stars, day }: { stars: number; day: number }) => {
   return (
     <Link to={`./days/${day + 1}`}>
       <Card className="min-w-24 hover:scale-105 transition-all">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center sm:p-6 p-3">
           <h2 className="text-lg font-bold">Day {day + 1}</h2>
         </CardHeader>
-        <CardContent className="justify-center flex text-2xl gap-1 ">
+        <CardContent className="justify-center flex sm:text-2xl text-lg gap-1 sm:p-6 p-3 sm:pt-0">
           {getStars()}
         </CardContent>
       </Card>

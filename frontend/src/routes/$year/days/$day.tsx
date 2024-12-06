@@ -88,31 +88,35 @@ function RouteComponent() {
         </span>
       </span>
 
-      <div className="flex mx-auto gap-4 mt-4 w-full flex-1 max-h-[600px]">
+      <div className="flex mx-auto gap-4 mt-4 w-full flex-1 sm:max-h-[1000px] sm:flex-row flex-col max-h-full">
         {/* Inputs */}
-        <div className="flex-1 bg-white p-4 rounded-lg shadow-md">
+        <div className="flex-1 bg-white p-4 rounded-lg shadow-md sm:order-1 order-2 flex flex-col">
           <Tabs
             defaultValue={inputTab}
             onValueChange={(value) => {
               setInputTab(value as InputTab);
             }}
-            className="w-full flex flex-col h-full"
+            className=" flex-grow-0 flex justify-center  mx-auto"
           >
             <TabsList>
               <TabsTrigger value={InputTab.Input}>Input</TabsTrigger>
               <TabsTrigger value={InputTab.Custom}>Custom</TabsTrigger>
             </TabsList>
-
-            <Textarea
-              disabled={inputTab !== InputTab.Custom}
-              className="mt-4 h-full"
-              onChange={(e) => setInput(e.target.value)}
-              value={userText}
-            />
           </Tabs>
+          <Textarea
+            aria-label={
+              inputTab === InputTab.Custom
+                ? "Custom puzzle input"
+                : "Puzzle input"
+            }
+            disabled={inputTab !== InputTab.Custom}
+            className="mt-4 h-full resize-none"
+            onChange={(e) => setInput(e.target.value)}
+            value={userText}
+          />
         </div>
 
-        <div className="h-fit flex-1 bg-white p-4 rounded-lg shadow-md max-w-[200px]">
+        <div className="h-fit sm:flex-1 flex-none bg-white p-4 rounded-lg shadow-md sm:max-w-[200px] sm:order-2 order-1 max-w-full">
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-lg font-bold">Part 1</h2>
