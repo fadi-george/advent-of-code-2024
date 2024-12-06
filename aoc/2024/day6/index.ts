@@ -17,7 +17,7 @@ export default (input: string) => {
     let [r, c, dir] = [startI, startJ, Direction.Up];
     const visitedMap = new Set<number>();
 
-    while (r >= 0 && r < grid.length && c >= 0 && c < width) {
+    while (true) {
       const next = getNext(r, c, dir);
       const nextChar = grid[next.r]?.[next.c];
 
@@ -28,7 +28,7 @@ export default (input: string) => {
       }
 
       if (nextChar === undefined) break;
-      if (nextChar === "#" || nextChar === "O") {
+      if (nextChar === "#") {
         dir = (dir + 1) % 4;
       } else {
         if (!checkForLoop) visited.add(get1DIndex(next.r, next.c, width));
@@ -46,7 +46,7 @@ export default (input: string) => {
     if (r === startI && c === startJ) return;
 
     const originalR = grid[r];
-    grid[r] = grid[r].substring(0, c) + "O" + grid[r].substring(c + 1);
+    grid[r] = grid[r].substring(0, c) + "#" + grid[r].substring(c + 1);
     if (traverse(true)) p2Count++;
     grid[r] = originalR;
   });
