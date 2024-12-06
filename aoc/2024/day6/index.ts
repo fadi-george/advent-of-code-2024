@@ -48,13 +48,13 @@ export default (input: string) => {
 
   let p2Count = 0;
   [...visited].forEach((index) => {
-    const [rr, cc] = get2DIndex(index, width);
-    if (rr === startI && cc === startJ) return;
+    const [r, c] = get2DIndex(index, width);
+    if (r === startI && c === startJ) return;
 
-    const originalChar = grid[rr][cc];
-    grid[rr] = grid[rr].slice(0, cc) + "O" + grid[rr].slice(cc + 1);
+    const originalR = grid[r];
+    grid[r] = grid[r].substring(0, c) + "O" + grid[r].substring(c + 1);
     if (traverse(true)) p2Count++;
-    grid[rr] = grid[rr].slice(0, cc) + originalChar + grid[rr].slice(cc + 1);
+    grid[r] = originalR;
   });
 
   return { part1: visited.size, part2: p2Count };
