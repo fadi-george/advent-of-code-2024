@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
+  DropdownMenuArrow,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuItem,
@@ -51,7 +52,10 @@ const YearDropdown = ({ year }: { year: number }) => {
       <DropdownMenuTrigger className="cursor-pointer underline decoration-dotted underline-offset-[8px]">
         {year}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-[80px] justify-center max-h-[148px] overflow-y-auto">
+      <DropdownMenuContent
+        className="min-w-[80px] justify-center max-h-[120px] overflow-y-auto"
+        side="top"
+      >
         {years.map((y) => (
           <DropdownMenuItem
             className=" justify-center text-lg "
@@ -62,6 +66,7 @@ const YearDropdown = ({ year }: { year: number }) => {
             {y}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuArrow />
       </DropdownMenuContent>
     </DropdownMenu>
   );

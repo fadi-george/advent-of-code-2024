@@ -29,11 +29,11 @@ export default (input: string) => {
 
       if (nextChar === undefined) break;
       if (nextChar === "#") {
-        dir = (dir + 1) % 4;
-      } else {
-        if (!checkForLoop) visited.add(get1DIndex(next.r, next.c, width));
-        [r, c] = [next.r, next.c];
+        dir = (dir + 1) & 3;
+        continue;
       }
+      if (!checkForLoop) visited.add(get1DIndex(next.r, next.c, width));
+      [r, c] = [next.r, next.c];
     }
     return false;
   };

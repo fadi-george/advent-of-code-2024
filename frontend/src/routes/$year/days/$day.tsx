@@ -77,7 +77,9 @@ function RouteComponent() {
         >
           <FaArrowLeft />
         </Button>
-        <h1 className="text-2xl font-bold">Day {day}</h1>
+        <h1 className="text-2xl font-bold">
+          {year} / Day {day}
+        </h1>
         <span className="flex items-center gap-1 ml-2">
           {new Array(dayStars).fill(0).map((_, i) => (
             <GiRoundStar
