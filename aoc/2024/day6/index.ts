@@ -1,11 +1,5 @@
+import { Direction } from "../../constants";
 import { get1DIndex, get2DIndex } from "../../lib/array";
-
-enum Direction {
-  Up,
-  Right,
-  Down,
-  Left,
-}
 
 export default (input: string) => {
   const grid = input.split("\n");
