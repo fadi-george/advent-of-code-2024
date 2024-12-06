@@ -1,3 +1,5 @@
+import { get1DIndex, get2DIndex } from "../../lib/array";
+
 enum Direction {
   Up,
   Right,
@@ -7,20 +9,12 @@ enum Direction {
 
 export default (input: string) => {
   const grid: string[] = [];
-  input.split("\n").forEach((line) => {
-    grid.push(line);
-  });
+  input.split("\n").forEach((l) => grid.push(l));
 
-  // find the start position
-  let gI = grid.findIndex((line) => line.includes("^"));
-  let gJ = grid[gI].indexOf("^");
+  // find guard position
+  const startI = grid.findIndex((line) => line.includes("^"));
+  const startJ = grid[startI].indexOf("^");
   let dir = Direction.Up;
-  let visited = new Set<string>();
-
-  const sGI = gI;
-  const sGJ = gJ;
-
-  const rowCol2Index = (r: number, c: number) => `${r},${c}`;
 
   const getNext = (r: number, c: number, d: Direction) => {
     switch (d) {
@@ -35,47 +29,46 @@ export default (input: string) => {
     }
   };
 
-  while (gI >= 0 && gI < grid.length && gJ >= 0 && gJ < grid[gI].length) {
-    // next step
-    const next = getNext(gI, gJ, dir);
+  const width = grid[0].length;
+  const visited = new Set<number>();
 
-    const nextChar = grid[next.r]?.[next.c];
-    if (nextChar === "#") {
-      // turn right
-      dir = (dir + 1) % 4;
-    } else {
-      if (nextChar !== undefined) visited.add(rowCol2Index(next.r, next.c));
-      gI = next.r;
-      gJ = next.c;
+  const countPositions = () => {
+    let gR = startI;
+    let gC = startJ;
+    while (gR >= 0 && gR < grid.length && gC >= 0 && gC < grid[gR].length) {
+      // next step
+      const next = getNext(gR, gC, dir);
+
+      const nextChar = grid[next.r]?.[next.c];
+      if (nextChar === "#") {
+        // turn right
+        dir = (dir + 1) % 4;
+      } else {
+        if (nextChar !== undefined)
+          visited.add(get1DIndex(next.r, next.c, width));
+        gR = next.r;
+        gC = next.c;
+      }
     }
-  }
+  };
 
-  // // find loops
-  let rr;
-  let cc;
+  countPositions();
 
   const checkLoop = () => {
-    let gR = sGI;
-    let gC = sGJ;
+    let gR = startI;
+    let gC = startJ;
     let dir = Direction.Up;
     let visited2 = new Set<string>();
 
     while (gR >= 0 && gR < grid.length && gC >= 0 && gC < grid[0].length) {
-      // console.log({ rr, cc, gR, gC });
-      // console.log({ rr, cc, gR, gC });
       const next = getNext(gR, gC, dir);
       const nextChar = grid[next.r]?.[next.c];
 
-      // if (nextChar === "O") {
-      //   if (visited2.has(rowCol2Index(next.r, next.c) + "," + dir)) return true;
-      //   else visited2.add(rowCol2Index(next.r, next.c) + "," + dir);
-      // }
-      if (visited2.has(rowCol2Index(next.r, next.c) + "," + dir)) return true;
-      // if (nextChar !== undefined)
-      visited2.add(rowCol2Index(next.r, next.c) + "," + dir);
+      if (visited2.has(get1DIndex(next.r, next.c, width) + "," + dir))
+        return true;
+      visited2.add(get1DIndex(next.r, next.c, width) + "," + dir);
 
       if (nextChar === "#" || nextChar === "O") {
-        // turn right
         dir = (dir + 1) % 4;
       } else {
         gR = next.r;
@@ -88,10 +81,10 @@ export default (input: string) => {
   let p2Count = 0;
 
   [...visited].forEach((index) => {
-    [rr, cc] = index.split(",").map(Number);
+    const [rr, cc] = get2DIndex(index, width);
 
     const originalRow = grid[rr].slice(0);
-    if (rr === sGI && cc === sGJ) return;
+    if (rr === startI && cc === startJ) return;
     grid[rr] = grid[rr].slice(0, cc) + "O" + grid[rr].slice(cc + 1);
     if (checkLoop()) {
       p2Count++;
