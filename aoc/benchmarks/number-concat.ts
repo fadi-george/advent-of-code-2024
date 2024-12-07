@@ -5,18 +5,22 @@ const numbers = [
   [123, 456], // triple digits
   [1234, 5678], // four digits
   [12345, 67890], // five digits
+  [12345, 1],
+  [12345, 12],
+  [12345, 123],
+  [12345, 1234],
 ];
 
 numbers.forEach(([a, b]) => {
   console.log(`\nTesting with numbers: ${a}, ${b}`);
 
-  // fastest on average
   console.time("template-literal");
   for (let i = 0; i < iterations; i++) {
     let result = +`${a}${b}`;
   }
   console.timeEnd("template-literal");
 
+  // fastest
   console.time("math-method");
   for (let i = 0; i < iterations; i++) {
     let result = a * 10 ** (Math.floor(Math.log10(b)) + 1) + b;

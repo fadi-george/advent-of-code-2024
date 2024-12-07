@@ -1,3 +1,6 @@
+const numberConcat = (a: number, b: number) =>
+  a * 10 ** (Math.floor(Math.log10(b)) + 1) + b;
+
 const getCombs = (arr: number[], allowConcat = false) => {
   if (arr.length === 1) return [arr[0]];
 
@@ -5,7 +8,7 @@ const getCombs = (arr: number[], allowConcat = false) => {
   const q = [
     { v: arr[0] + arr[1], l: 2 },
     { v: arr[0] * arr[1], l: 2 },
-    ...(allowConcat ? [{ v: +`${arr[0]}${arr[1]}`, l: 2 }] : []),
+    ...(allowConcat ? [{ v: numberConcat(arr[0], arr[1]), l: 2 }] : []),
   ];
 
   for (const curr of q) {
@@ -17,7 +20,9 @@ const getCombs = (arr: number[], allowConcat = false) => {
     q.push(
       { v: curr.v + arr[curr.l], l: curr.l + 1 },
       { v: curr.v * arr[curr.l], l: curr.l + 1 },
-      ...(allowConcat ? [{ v: +`${curr.v}${arr[curr.l]}`, l: curr.l + 1 }] : [])
+      ...(allowConcat
+        ? [{ v: numberConcat(curr.v, arr[curr.l]), l: curr.l + 1 }]
+        : [])
     );
   }
 
