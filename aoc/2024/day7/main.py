@@ -25,7 +25,5 @@ def check_target(arr: list[int], target: int, allow_concat: bool = False) -> boo
 
 
 vals = [[int(n) for n in re.findall(r"\d+", line)] for line in fileinput.input()]
-p1 = sum(product for product, *rest in vals if check_target(rest, product))
-p2 = sum(product for product, *rest in vals if check_target(rest, product, True))
-print(p1)
-print(p2)
+print(sum(p for p, *r in vals if check_target(r, p)))
+print(sum(p for p, *r in vals if check_target(r, p, True)))
