@@ -7,41 +7,42 @@ export default (input: string) => {
   });
 
   let p1 = 0;
+  let p2 = 0;
   vals.forEach((val) => {
     const product = val[0];
     const combs = getCombs(val.slice(1));
+    const combs2 = getCombs(val.slice(1), true);
+    // console.log(product, combs, combs2);
     if (combs.some((n) => n === product)) p1 += product;
+    if (combs2.some((n) => n === product)) p2 += product;
   });
 
-  return { part1: p1, part2: "" };
+  return { part1: p1, part2: p2 };
 };
 
-const getCombs = (val: number[]) => {
+const getCombs = (val: number[], allowConcat = false) => {
   // console.log(val);
   if (val.length === 2) {
-    return [val[0] + val[1], val[0] * val[1]];
+    const res = [val[0] + val[1], val[0] * val[1]];
+    if (allowConcat) res.push(+`${val[0]}${val[1]}`);
+    return res;
   } else if (val.length === 1) {
     return val;
   }
   const res: number[] = [];
   const last = val[val.length - 1];
+  const first = val[0];
   getCombs(val.slice(0, -1)).forEach((n) => {
     res.push(n + last);
     res.push(n * last);
+    if (allowConcat) res.push(+`${n}${last}`);
   });
-  // const res: number[] = [];
-  // [val[0] + val[1], val[0] * val[1]].forEach((op) => {
-  //   getCombs(val.slice(2)).forEach((n) => {
-  //     res.push(op + n);
-  //     res.push(op * n);
-  //   });
-  // });
-  // const res: number[] = [];
-  // const newStrs = getCombs(val.slice(1));
-  // newStrs.forEach((newStr) => {
-  //   res.push(val[0] + newStr);
-  //   res.push(val[0] * newStr);
-  // });
+  if (allowConcat) {
+    getCombs(val.slice(1), true).forEach((n) => {
+      res.push(+`${first}${n}`);
+      res.push(+`${n}${first}`);
+    });
+  }
   return res;
 };
 
