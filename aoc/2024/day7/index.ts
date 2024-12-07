@@ -1,10 +1,9 @@
 const numberConcat = (a: number, b: number) =>
   a * 10 ** (Math.floor(Math.log10(b)) + 1) + b;
 
-const getCombs = (arr: number[], allowConcat = false) => {
-  if (arr.length === 1) return [arr[0]];
+const checkTarget = (arr: number[], target: number, allowConcat = false) => {
+  if (arr.length === 1) return arr[0] === target;
 
-  const res: number[] = [];
   const q = [
     { v: arr[0] + arr[1], l: 2 },
     { v: arr[0] * arr[1], l: 2 },
@@ -12,10 +11,8 @@ const getCombs = (arr: number[], allowConcat = false) => {
   ];
 
   for (const curr of q) {
-    if (curr.l === arr.length) {
-      res.push(curr.v);
-      continue;
-    }
+    if (curr.v === target && curr.l === arr.length) return true;
+    if (curr.l === arr.length) continue;
 
     q.push(
       { v: curr.v + arr[curr.l], l: curr.l + 1 },
@@ -26,7 +23,7 @@ const getCombs = (arr: number[], allowConcat = false) => {
     );
   }
 
-  return res;
+  return false;
 };
 
 export default (input: string) => {
@@ -40,10 +37,8 @@ export default (input: string) => {
   let p2 = 0;
   vals.forEach((val) => {
     const [product, ...rest] = val;
-    const combs = getCombs(rest);
-    const combs2 = getCombs(rest, true);
-    p1 += combs.includes(product) ? product : 0;
-    p2 += combs2.includes(product) ? product : 0;
+    p1 += checkTarget(rest, product) ? product : 0;
+    p2 += checkTarget(rest, product, true) ? product : 0;
   });
 
   return { part1: p1, part2: p2 };
