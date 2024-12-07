@@ -1,15 +1,21 @@
 const checkTarget = (arr: number[], target: number, allowConcat = false) => {
-  const dfs = (value: number, length: number): boolean => {
-    let i = 1;
-    while (i < arr[length]) i *= 10;
-    return length === arr.length
-      ? value === target
-      : dfs(value + arr[length], length + 1) ||
-          dfs(value * arr[length], length + 1) ||
-          (allowConcat && dfs(value * i + arr[length], length + 1));
+  const dfs = (v: number, i: number): boolean => {
+    if (i === 0) return v === arr[0];
+
+    let d = 1;
+    let n = arr[i];
+    while (d <= n) d *= 10;
+
+    let res = false;
+    // if numbers are concatenated, then shift to the right by how many digits the
+    if (allowConcat && v % d === n) res ||= dfs(Math.floor(v / d), i - 1);
+    // check if the number is a valid divisor
+    res ||= v % n === 0 && dfs(v / n, i - 1);
+    res ||= dfs(v - n, i - 1);
+    return res;
   };
 
-  return dfs(arr[0], 1);
+  return dfs(target, arr.length - 1);
 };
 
 export default (input: string) => {
