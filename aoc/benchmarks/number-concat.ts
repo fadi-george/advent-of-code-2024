@@ -47,4 +47,14 @@ numbers.forEach(([a, b]) => {
     let result = parseInt(a + "" + b);
   }
   console.timeEnd("parse-int");
+
+  // While loop
+  console.time("while-loop");
+  for (let i = 0; i < iterations; i++) {
+    let result = 0;
+    let i = 1;
+    while (i < b) i *= 10;
+    result = a * i + b;
+  }
+  console.timeEnd("while-loop");
 });

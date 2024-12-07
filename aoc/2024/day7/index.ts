@@ -1,19 +1,15 @@
-const numberConcat = (a: number, b: number) =>
-  a * 10 ** (Math.floor(Math.log10(b)) + 1) + b;
-
 const checkTarget = (arr: number[], target: number, allowConcat = false) => {
-  const dfs = (value: number, length: number): boolean =>
-    length === arr.length
+  const dfs = (value: number, length: number): boolean => {
+    let i = 1;
+    while (i < arr[length]) i *= 10;
+    return length === arr.length
       ? value === target
       : dfs(value + arr[length], length + 1) ||
-        dfs(value * arr[length], length + 1) ||
-        (allowConcat && dfs(numberConcat(value, arr[length]), length + 1));
+          dfs(value * arr[length], length + 1) ||
+          (allowConcat && dfs(value * i + arr[length], length + 1));
+  };
 
-  return (
-    dfs(arr[0] + arr[1], 2) ||
-    dfs(arr[0] * arr[1], 2) ||
-    (allowConcat && dfs(numberConcat(arr[0], arr[1]), 2))
-  );
+  return dfs(arr[0], 1);
 };
 
 export default (input: string) => {

@@ -1,27 +1,21 @@
 import fileinput
 import re
-from math import log10, floor
-
-
-def number_concat(a: int, b: int) -> int:
-    return a * 10 ** (floor(log10(b)) + 1) + b
 
 
 def check_target(arr: list[int], target: int, allow_concat: bool = False) -> bool:
     def dfs(value: int, length: int) -> bool:
         if length == len(arr):
             return value == target
+        i = 1
+        while i < arr[length]:
+            i *= 10
         return (
             dfs(value + arr[length], length + 1)
             or dfs(value * arr[length], length + 1)
-            or (allow_concat and dfs(number_concat(value, arr[length]), length + 1))
+            or (allow_concat and dfs(value * i + arr[length], length + 1))
         )
 
-    return (
-        dfs(arr[0] + arr[1], 2)
-        or dfs(arr[0] * arr[1], 2)
-        or (allow_concat and dfs(number_concat(arr[0], arr[1]), 2))
-    )
+    return dfs(arr[0], 1)
 
 
 vals = [[int(n) for n in re.findall(r"\d+", line)] for line in fileinput.input()]
