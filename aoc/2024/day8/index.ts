@@ -16,9 +16,8 @@ export default (input: string) => {
   }
 
   const getImpact = (isCapped: boolean) => {
-    const visited: Set<string> = new Set();
-    Object.keys(antennas).forEach((a) => {
-      const ps = antennas[a];
+    const visited: Set<number> = new Set();
+    Object.entries(antennas).forEach(([_, ps]) => {
       for (let i = 0; i < ps.length; i++) {
         for (let j = i + 1; j < ps.length; j++) {
           const [x1, y1] = ps[i];
@@ -30,17 +29,17 @@ export default (input: string) => {
           let p2 = [x2 + dx, y2 + dy];
 
           if (!isCapped) {
-            visited.add(`${x1},${y1}`);
-            visited.add(`${x2},${y2}`);
+            visited.add(get1DIndex(x1, y1, w));
+            visited.add(get1DIndex(x2, y2, w));
           }
 
           while (grid[p1[0]]?.[p1[1]] !== undefined) {
-            visited.add(`${p1[0]},${p1[1]}`);
+            visited.add(get1DIndex(p1[0], p1[1], w));
             p1 = [p1[0] - dx, p1[1] - dy];
             if (isCapped) break;
           }
           while (grid[p2[0]]?.[p2[1]] !== undefined) {
-            visited.add(`${p2[0]},${p2[1]}`);
+            visited.add(get1DIndex(p2[0], p2[1], w));
             p2 = [p2[0] + dx, p2[1] + dy];
             if (isCapped) break;
           }
