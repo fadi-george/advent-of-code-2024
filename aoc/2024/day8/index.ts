@@ -1,10 +1,8 @@
-import { get1DIndex } from "../../lib/array";
-
 export default (input: string) => {
   const grid = input.split("\n"),
     w = grid[0].length,
-    h = grid.length;
-  const antennas: Record<string, [number, number][]> = {};
+    h = grid.length,
+    antennas: Record<string, [number, number][]> = {};
 
   for (let i = 0; i < h; i++)
     for (let j = 0; j < w; j++)
@@ -12,11 +10,11 @@ export default (input: string) => {
         (antennas[grid[i][j]] ??= []).push([i, j]);
 
   const getImpact = (isCapped: boolean) => {
-    const visited = new Set<number>();
+    const visited = new Set<string>();
 
     const visitPoints = (p: number[], dir: number[]) => {
       while (grid[p[0]]?.[p[1]]) {
-        visited.add(get1DIndex(p[0], p[1], w));
+        visited.add(`${p}`);
         p = [p[0] + dir[0], p[1] + dir[1]];
         if (isCapped) break;
       }
@@ -29,16 +27,15 @@ export default (input: string) => {
             [x2, y2] = ps[j],
             dx = x2 - x1,
             dy = y2 - y1;
-          let p1 = [x1 - dx, y1 - dy],
-            p2 = [x2 + dx, y2 + dy];
 
           if (!isCapped)
-            [get1DIndex(x1, y1, w), get1DIndex(x2, y2, w)].forEach((i) =>
-              visited.add(i)
-            );
+            [
+              [x1, y1],
+              [x2, y2],
+            ].forEach((p) => visited.add(`${p}`));
 
-          visitPoints(p1, [-dx, -dy]);
-          visitPoints(p2, [dx, dy]);
+          visitPoints([x1 - dx, y1 - dy], [-dx, -dy]);
+          visitPoints([x2 + dx, y2 + dy], [dx, dy]);
         }
     });
     return visited.size;
