@@ -10,61 +10,43 @@ export default (input: string) => {
 };
 
 const moveBlocks = (blocks: string[]) => {
-  const str = blocks.slice();
-  let left = 0;
-  let right = str.length - 1;
-
-  while (left < right) {
-    while (str[left] !== ".") left++;
-    while (str[right] === ".") right--;
-    if (right < left) break;
-    [str[left], str[right]] = [str[right], str[left]];
-  }
-  return str;
+  const s = blocks.slice();
+  for (let l = 0, r = s.length - 1; l < r; l += +(s[l] !== "."), r -= +(s[r] === "."))
+    if (s[l] === "." && s[r] !== ".") [s[l], s[r]] = [s[r], s[l]];
+  return s;
 };
 
 const moveBlocks2 = (blocks: string[]) => {
-  const str = blocks.slice();
+  const s = blocks.slice();
   let left = 0;
-  let right = str.length - 1;
+  let right = s.length - 1;
 
   while (left < right) {
-    while (str[left] !== ".") left++;
-    while (str[right] === ".") right--;
+    while (s[left] !== ".") left++;
+    while (s[right] === ".") right--;
 
-    // s will stay on same "hole" until its filled
+    // count the length of the id block
     let j = right;
-
-    // count same id segment
-    const ch = str[j];
-    while (str[j] === ch) j--;
+    const ch = s[j];
+    while (s[j] === ch) j--;
     const blockLen = right - j;
 
     for (let i = left; i < right; i++) {
-      if (str[i] !== ".") continue;
-
-      // count dots
+      // count number of free spaces
+      if (s[i] !== ".") continue;
       let freeStart = i;
-      while (str[freeStart] === ".") freeStart++;
+      while (s[freeStart] === ".") freeStart++;
       const freeLen = freeStart - i;
 
-      const min = Math.min(freeLen, blockLen);
-
       if (blockLen <= freeLen) {
-        for (let n = 0; n < min; n++) {
-          str[freeStart - freeLen + n] = ch;
-          str[j + n + 1] = ".";
-        }
+        for (let n = 0; n < blockLen; n++)
+          [s[freeStart - freeLen + n], s[j + n + 1]] = [ch, "."];
         break;
       }
-      i++;
     }
-
-    // done with this segment
     right -= blockLen;
   }
-
-  return str;
+  return s;
 };
 
 const getChecksum = (s: string[]) =>
