@@ -2,18 +2,18 @@ import { describe, expect, test } from "bun:test";
 import { readFile } from "../../lib/file";
 import solution from "./index";
 
-describe("day 7", () => {
+describe("day 9", () => {
   test("example input", () => {
-    const input = readFile("aoc/2024/day7/sample.txt");
+    const input = readFile("aoc/2024/day9/sample.txt");
     const result = solution(input);
-    expect(result.part1).toBe(3749);
-    expect(result.part2).toBe(11387);
+    expect(result.part1).toBe(1928);
+    expect(result.part2).toBe(2858);
   });
 
   test("puzzle input", () => {
-    const input = readFile("aoc/2024/day7/input.txt");
+    const input = readFile("aoc/2024/day9/input.txt");
     const result = solution(input);
-    expect(result.part1).toBe(20281182715321);
-    expect(result.part2).toBe(159490400628354);
+    expect(result.part1).toBe(6259790630969);
+    expect(result.part2).toBe(6289564433984);
   });
 });
