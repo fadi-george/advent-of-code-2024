@@ -9,8 +9,8 @@ export default (input: string) => {
   return { part1: p1, part2: p2 };
 };
 
-const moveBlocks = (s: string[]) => {
-  const str = s.slice();
+const moveBlocks = (blocks: string[]) => {
+  const str = blocks.slice();
   let left = 0;
   let right = str.length - 1;
 
@@ -23,39 +23,36 @@ const moveBlocks = (s: string[]) => {
   return str;
 };
 
-const moveBlocks2 = (_s: string[]) => {
-  const str = _s.slice();
+const moveBlocks2 = (blocks: string[]) => {
+  const str = blocks.slice();
+  let left = 0;
+  let right = str.length - 1;
 
-  let s = 0;
-  let e = str.length - 1;
-  while (s < e) {
-    while (str[s] !== ".") s++;
-    while (str[e] === ".") e--;
+  while (left < right) {
+    while (str[left] !== ".") left++;
+    while (str[right] === ".") right--;
 
     // s will stay on same "hole" until its filled
-    let j = e;
+    let j = right;
 
     // count same id segment
     const ch = str[j];
     while (str[j] === ch) j--;
-    const rightLen = e - j;
+    const blockLen = right - j;
 
-    for (let i = s; i < j; i++) {
+    for (let i = left; i < right; i++) {
       if (str[i] !== ".") continue;
 
       // count dots
-      let leftLen = 0;
-      let d = i;
-      while (str[d] === ".") {
-        leftLen++;
-        d++;
-      }
+      let freeStart = i;
+      while (str[freeStart] === ".") freeStart++;
+      const freeLen = freeStart - i;
 
-      const min = Math.min(leftLen, rightLen);
+      const min = Math.min(freeLen, blockLen);
 
-      if (rightLen <= leftLen) {
+      if (blockLen <= freeLen) {
         for (let n = 0; n < min; n++) {
-          str[d - leftLen + n] = ch;
+          str[freeStart - freeLen + n] = ch;
           str[j + n + 1] = ".";
         }
         break;
@@ -64,7 +61,7 @@ const moveBlocks2 = (_s: string[]) => {
     }
 
     // done with this segment
-    e -= rightLen;
+    right -= blockLen;
   }
 
   return str;
