@@ -1,16 +1,7 @@
 export default (input: string) => {
   const S = [];
-  let id = 0;
-  for (let i = 0; i < input.length; i++) {
-    const amount = +input[i];
-    if (i % 2 === 0) {
-      S.push(...Array(amount).fill(id));
-      id++;
-      if (amount === 0) continue;
-    } else {
-      S.push(...Array(amount).fill("."));
-    }
-  }
+  for (let i = 0; i < input.length; i++)
+    S.push(...Array(+input[i]).fill(i % 2 === 0 ? i / 2 : "."));
 
   const p1 = getChecksum(moveBlocks(S));
   const p2 = getChecksum(moveBlocks2(S));
@@ -20,20 +11,15 @@ export default (input: string) => {
 
 const moveBlocks = (s: string[]) => {
   const str = s.slice();
-  let i = 0;
-  let j = str.length - 1;
-  while (i < j) {
-    if (str[i] !== ".") {
-      i++;
-      continue;
-    }
-    if (str[j] === ".") {
-      j--;
-      continue;
-    }
-    [str[i], str[j]] = [str[j], str[i]];
-  }
+  let left = 0;
+  let right = str.length - 1;
 
+  while (left < right) {
+    while (str[left] !== ".") left++;
+    while (str[right] === ".") right--;
+    if (right < left) break;
+    [str[left], str[right]] = [str[right], str[left]];
+  }
   return str;
 };
 
@@ -43,27 +29,19 @@ const moveBlocks2 = (_s: string[]) => {
   let s = 0;
   let e = str.length - 1;
   while (s < e) {
-    if (str[s] !== ".") {
-      s++;
-      continue;
-    }
-    if (str[e] === ".") {
-      e--;
-      continue;
-    }
+    while (str[s] !== ".") s++;
+    while (str[e] === ".") e--;
 
+    // s will stay on same "hole" until its filled
     let j = e;
-    let sub = 1;
 
-    // count ids
+    // count same id segment
     const ch = str[j];
     while (str[j] === ch) j--;
     const rightLen = e - j;
 
     for (let i = s; i < j; i++) {
-      if (str[i] !== ".") {
-        continue;
-      }
+      if (str[i] !== ".") continue;
 
       // count dots
       let leftLen = 0;
@@ -80,21 +58,17 @@ const moveBlocks2 = (_s: string[]) => {
           str[d - leftLen + n] = ch;
           str[j + n + 1] = ".";
         }
-        sub = min;
         break;
       }
       i++;
     }
 
+    // done with this segment
     e -= rightLen;
   }
 
   return str;
 };
 
-const getChecksum = (s: string[]) => {
-  return s.reduce((acc, curr, i) => {
-    if (curr === ".") return acc;
-    return acc + +curr * i;
-  }, 0);
-};
+const getChecksum = (s: string[]) =>
+  s.reduce((acc, curr, i) => (curr === "." ? acc : acc + +curr * i), 0);
