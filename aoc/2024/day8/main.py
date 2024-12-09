@@ -1,4 +1,5 @@
 import fileinput
+from itertools import combinations
 
 grid = [line.strip() for line in fileinput.input()]
 w, h = len(grid[0]), len(grid)
@@ -20,12 +21,7 @@ def get_impact(is_capped):
                 break
 
     for points in ants.values():
-        pairs = [
-            (points[i], points[j])
-            for i in range(len(points))
-            for j in range(i + 1, len(points))
-        ]
-
+        pairs = combinations(points, 2)
         for (x1, y1), (x2, y2) in pairs:
             dx, dy = x2 - x1, y2 - y1
             p1, p2 = [x1 - dx, y1 - dy], [x2 + dx, y2 + dy]
