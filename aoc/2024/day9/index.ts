@@ -1,73 +1,25 @@
 export default (input: string) => {
   const S = [];
-  let S2 = [];
   let id = 0;
   for (let i = 0; i < input.length; i++) {
     const amount = +input[i];
     if (i % 2 === 0) {
       S.push(...Array(amount).fill(id));
-      S2.push(`${id}`.repeat(amount));
       id++;
       if (amount === 0) continue;
     } else {
       S.push(...Array(amount).fill("."));
-      S2.push(".".repeat(amount));
     }
   }
 
-  console.log(S);
-  console.log(S2);
-
-  console.log(S2.join(""));
-  console.log(S2);
-
-  // let p1 = 0;
-  // for (let i = 0; i < S.length; i++) {
-  //   if (S[i] === ".") continue;
-  //   p1 += +S[i] * i;
-  // }
-  const p1 = updateChecksum(S)
-    .filter((c) => c !== ".")
-    .reduce((acc, curr, i) => acc + +curr * i, 0);
-
-  let i = 0;
-  let j = S2.length - 1;
-  while (i < j) {
-    if (!S2[i].startsWith(".")) {
-      i++;
-      continue;
-    }
-    if (S2[j].startsWith(".")) {
-      j--;
-      continue;
-    }
-    if (S2[j].length <= S2[i].length) {
-      [S2[i], S2[j]] = [S2[j], S2[i]];
-      i++;
-      j--;
-    } else {
-      j--;
-    }
-  }
-
-  console.log([...S2.join("")].join(""));
-  S2 = updateChecksum([...S2.join("")]);
-  console.log(S2.join(""));
-  const p2 = S2.reduce((acc, curr, i) => {
-    if (curr === ".") return acc;
-    return acc + +curr * i;
-  }, 0);
-
-  // const p1 = S.reduce((acc, curr, i) => {
-  //   if (curr === ".") return acc;
-  //   return acc + +curr * i;
-  // }, 0);
-  // console.log(p1);
+  const p1 = getChecksum(moveBlocks(S));
+  const p2 = getChecksum(moveBlocks2(S));
 
   return { part1: p1, part2: p2 };
 };
 
-const updateChecksum = (str: string[]) => {
+const moveBlocks = (s: string[]) => {
+  const str = s.slice();
   let i = 0;
   let j = str.length - 1;
   while (i < j) {
@@ -85,5 +37,64 @@ const updateChecksum = (str: string[]) => {
   return str;
 };
 
-// 88957760693 - wrong, wrong
-// 5609635945 - wrong
+const moveBlocks2 = (_s: string[]) => {
+  const str = _s.slice();
+
+  let s = 0;
+  let e = str.length - 1;
+  while (s < e) {
+    if (str[s] !== ".") {
+      s++;
+      continue;
+    }
+    if (str[e] === ".") {
+      e--;
+      continue;
+    }
+
+    let j = e;
+    let sub = 1;
+
+    // count ids
+    const ch = str[j];
+    while (str[j] === ch) j--;
+    const rightLen = e - j;
+
+    for (let i = s; i < j; i++) {
+      if (str[i] !== ".") {
+        continue;
+      }
+
+      // count dots
+      let leftLen = 0;
+      let d = i;
+      while (str[d] === ".") {
+        leftLen++;
+        d++;
+      }
+
+      const min = Math.min(leftLen, rightLen);
+
+      if (rightLen <= leftLen) {
+        for (let n = 0; n < min; n++) {
+          str[d - leftLen + n] = ch;
+          str[j + n + 1] = ".";
+        }
+        sub = min;
+        break;
+      }
+      i++;
+    }
+
+    e -= rightLen;
+  }
+
+  return str;
+};
+
+const getChecksum = (s: string[]) => {
+  return s.reduce((acc, curr, i) => {
+    if (curr === ".") return acc;
+    return acc + +curr * i;
+  }, 0);
+};
