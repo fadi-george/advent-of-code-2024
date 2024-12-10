@@ -1,7 +1,7 @@
-import { readFile } from "./lib/file.ts";
+import { readFile } from "./lib/file";
 
 const year = process.env.YEAR;
-const day = process.env.DAY;
+const day = process.env.DAY?.padStart(2, "0");
 const fileName = process.env.FILE;
 
 const runner = await import(`./${year}/day${day}/index.ts`);
