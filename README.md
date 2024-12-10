@@ -2,7 +2,7 @@
 
 Solutions written in Typescript.
 
-<img width="1912" alt="Screenshot 2024-12-05 at 11 02 13 AM" src="https://github.com/user-attachments/assets/91a5bafc-3908-4819-9b9f-df62374461fe">
+<img width="1912" alt="Screenshot 2024-12-09 at 10 16 48 PM" src="https://github.com/user-attachments/assets/af5aac67-d390-40b7-a5f1-73749789a9fc">
 <img width="1912" alt="Screenshot 2024-12-05 at 11 02 25 AM" src="https://github.com/user-attachments/assets/45ae8a28-b33e-4030-ba9e-facbd2f5eb2c">
 
 ## Running
