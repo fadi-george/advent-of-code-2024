@@ -9,6 +9,7 @@ export const getStarsQueryOptions = (year: string) =>
         return res.json();
       }),
   });
+
 export const getInputsQueryOptions = (year: string, day: string) =>
   queryOptions<string>({
     queryKey: ["get-inputs", year, day],
@@ -17,4 +18,10 @@ export const getInputsQueryOptions = (year: string, day: string) =>
         if (!res.ok) throw new Error("Failed to fetch inputs");
         return res.text();
       }),
+  });
+
+export const getTotalStarsQueryOptions = () =>
+  queryOptions<number>({
+    queryKey: ["get-total-stars"],
+    queryFn: () => fetch(`/api/stars/all`).then((res) => res.json()),
   });
