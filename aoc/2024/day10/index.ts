@@ -1,57 +1,41 @@
+const DIRS = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
 export default (input: string) => {
   const grid = input.split("\n");
 
-  // find all 0s
   const startPos = [];
-  for (let r = 0; r < grid.length; r++) {
-    for (let c = 0; c < grid[r].length; c++) {
-      if (grid[r][c] === "0") {
-        startPos.push([r, c]);
-      }
-    }
-  }
+  for (let r = 0; r < grid.length; r++)
+    for (let c = 0; c < grid[r].length; c++)
+      if (grid[r][c] === "0") startPos.push([r, c]);
 
-  // const sr = grid.findIndex((row) => row.includes("0"));
-  // const sc = grid[sr].indexOf("0");
-  // console.table(grid);
-  // console.log({ sr, sc });
-
-  const q = startPos.map(([r, c]) => ({ r, c, d: 0, path: [[r, c]], sr: r, sc: c }));
-  // console.log({ q, l: q.length });
-  // const visited = new Set<string>();
+  const q = startPos.map(([r, c]) => ({ sr: r, sc: c, r, c }));
   const endSet = new Set<string>();
-  let p1 = 0;
-  let p2 = 0;
+  let [p1, p2] = [0, 0];
 
   while (q.length > 0) {
-    const { r, c, d, sr, sc, path } = q.shift()!;
-    // console.log({ r, c, d, path });
+    const { r, c, sr, sc } = q.shift()!;
+    const height = +grid[r][c];
 
-    // if (visited.has(`${r},${c}`)) continue;
-    if (d === 9) {
-      // console.log({ r, c, p1, sr, sc, path });
-      if (!endSet.has(`${r},${c},${sr},${sc}`)) {
+    if (height === 9) {
+      // must be a unique trail from a different start positions
+      const key = `${r},${c},${sr},${sc}`;
+      if (!endSet.has(key)) {
         p1 += 1;
+        endSet.add(key);
       }
       p2 += 1;
-      endSet.add(`${r},${c},${sr},${sc}`);
       continue;
     }
 
-    [
-      [r - 1, c], // up
-      [r + 1, c], // down
-      [r, c - 1], // left
-      [r, c + 1], // right
-    ].forEach(([nr, nc]) => {
-      if (grid[nr]?.[nc] === `${d + 1}`) {
-        q.push({ r: nr, c: nc, d: d + 1, sr, sc, path: [...path, [nr, nc]] });
-      }
-    });
+    for (const [dr, dc] of DIRS)
+      if (grid[r + dr]?.[c + dc] === `${height + 1}`)
+        q.push({ sr, sc, r: r + dr, c: c + dc });
   }
 
-  // console.log({ p1 });
   return { part1: p1, part2: p2 };
 };
-
-// 156 - wrong
