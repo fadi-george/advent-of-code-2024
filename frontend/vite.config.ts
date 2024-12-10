@@ -5,7 +5,15 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths(), TanStackRouterVite()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler"]],
+      },
+    }),
+    tsconfigPaths(),
+    TanStackRouterVite(),
+  ],
   server: {
     port: 3000,
     open: true,
