@@ -18,7 +18,7 @@ export default (input: string) => {
 
   const q = startPos.map(([r, c]) => ({ r, c, d: 0, path: [[r, c]], sr: r, sc: c }));
   // console.log({ q, l: q.length });
-  const visited = new Set<string>();
+  // const visited = new Set<string>();
   const endSet = new Set<string>();
   let p1 = 0;
 
@@ -26,18 +26,15 @@ export default (input: string) => {
     const { r, c, d, sr, sc, path } = q.shift()!;
     // console.log({ r, c, d, path });
 
-    if (visited.has(`${r},${c}`)) continue;
+    // if (visited.has(`${r},${c}`)) continue;
     if (d === 9) {
       // console.log({ r, c, p1, sr, sc, path });
-      // visited.add(`${r},${c}`);
-      // console.log({ path });
       if (!endSet.has(`${r},${c},${sr},${sc}`)) {
         p1 += 1;
       }
       endSet.add(`${r},${c},${sr},${sc}`);
       continue;
     }
-    visited.add(`${r},${c}`);
 
     [
       [r - 1, c], // up
