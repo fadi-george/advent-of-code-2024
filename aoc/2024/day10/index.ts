@@ -21,6 +21,7 @@ export default (input: string) => {
   // const visited = new Set<string>();
   const endSet = new Set<string>();
   let p1 = 0;
+  let p2 = 0;
 
   while (q.length > 0) {
     const { r, c, d, sr, sc, path } = q.shift()!;
@@ -32,6 +33,7 @@ export default (input: string) => {
       if (!endSet.has(`${r},${c},${sr},${sc}`)) {
         p1 += 1;
       }
+      p2 += 1;
       endSet.add(`${r},${c},${sr},${sc}`);
       continue;
     }
@@ -49,7 +51,7 @@ export default (input: string) => {
   }
 
   // console.log({ p1 });
-  return { part1: p1, part2: "" };
+  return { part1: p1, part2: p2 };
 };
 
 // 156 - wrong

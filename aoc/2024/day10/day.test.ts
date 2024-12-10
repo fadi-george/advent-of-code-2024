@@ -21,7 +21,7 @@ describe("day 10", () => {
     const input = readFile("aoc/2024/day10/sample3.txt");
     const result = solution(input);
     expect(result.part1).toBe(4);
-    // expect(result.part2).toBe(2858);
+    expect(result.part2).toBe(13);
   });
 
   test("example 4 input", () => {
@@ -35,13 +35,18 @@ describe("day 10", () => {
     const input = readFile("aoc/2024/day10/sample5.txt");
     const result = solution(input);
     expect(result.part1).toBe(36);
-    // expect(result.part2).toBe(2858);
+    expect(result.part2).toBe(81);
   });
 
-  // test("puzzle input", () => {
-  //   const input = readFile("aoc/2024/day10/input.txt");
-  //   const result = solution(input);
-  //   expect(result.part1).toBe(1928);
-  //   expect(result.part2).toBe(2858);
-  // });
+  test("example 6 input", () => {
+    const input = readFile("aoc/2024/day10/sample6.txt");
+    const result = solution(input);
+    expect(result.part2).toBe(3);
+  });
+
+  test("example 7 input", () => {
+    const input = readFile("aoc/2024/day10/sample7.txt");
+    const result = solution(input);
+    expect(result.part2).toBe(227);
+  });
 });
