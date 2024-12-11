@@ -1,44 +1,49 @@
-// import { DIRS } from "../../constants";
-
-// const [START_HEIGHT, END_HEIGHT] = [0, 9];
-
 export default (input: string) => {
   let stones = input.split("\n").map((r) => r.split(" ").map(Number))[0];
-  console.log(stones);
 
-  const blink = () => {
-    const res = [];
-    for (let i = 0; i < stones.length; i++) {
-      const stone = stones[i];
-      const stoneStr = `${stone}`;
-      let oldValue = stone;
+  const stoneCache = new Map<string, number>();
 
-      if (stone === 0) {
-        res.push(1);
-        oldValue = 1;
-      } else if (stoneStr.length % 2 === 0) {
-        const len = stoneStr.length;
-        const left = +stoneStr.slice(0, len / 2);
-        const right = +stoneStr.slice(len / 2);
-        oldValue = right;
-        res.push(left, right);
-      } else {
-        res.push(stone * 2024);
-      }
+  const search = (stone: number, i: number): number => {
+    if (stoneCache.has(`${stone}-${i}`)) return stoneCache.get(`${stone}-${i}`)!;
+    if (i === 0) {
+      stoneCache.set(`${stone}-${i}`, 1);
+      return 1;
     }
-    stones = res;
-    return res;
+    if (stone === 0) {
+      const result = search(1, i - 1);
+      stoneCache.set(`${stone}-${i}`, result);
+      return result;
+    }
+
+    const stoneStr = `${stone}`;
+    if (stoneStr.length % 2 === 0) {
+      const len = stoneStr.length;
+      const left = +stoneStr.slice(0, len / 2);
+      const right = +stoneStr.slice(len / 2);
+
+      const leftResult = search(left, i - 1);
+      const rightResult = search(right, i - 1);
+      const result = leftResult + rightResult;
+      stoneCache.set(`${stone}-${i}`, result);
+      return result;
+    }
+
+    const result = search(stone * 2024, i - 1);
+    stoneCache.set(`${stone}-${i}`, result);
+    return result;
   };
 
-  // console.log(blink());
+  let [p1, p2] = [0, 0];
 
-  for (let i = 0; i < 75; i++) {
-    blink();
+  for (let j = 0; j < stones.length; j++) {
+    p1 += search(stones[j], 25);
   }
-  console.log(stones.length);
+  for (let j = 0; j < stones.length; j++) {
+    p2 += search(stones[j], 75);
+  }
 
   return {
-    part1: "",
-    part2: "",
+    part1: p1,
+    part2: p2,
   };
 };
