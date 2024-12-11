@@ -1,49 +1,34 @@
-export default (input: string) => {
-  let stones = input.split("\n").map((r) => r.split(" ").map(Number))[0];
-
+export default (input: string, p1Blinks: number = 25, p2Blinks: number = 75) => {
+  const stones = input.split(" ").map(Number);
   const stoneCache = new Map<string, number>();
 
-  const search = (stone: number, i: number): number => {
-    if (stoneCache.has(`${stone}-${i}`)) return stoneCache.get(`${stone}-${i}`)!;
-    if (i === 0) {
-      stoneCache.set(`${stone}-${i}`, 1);
-      return 1;
-    }
-    if (stone === 0) {
-      const result = search(1, i - 1);
-      stoneCache.set(`${stone}-${i}`, result);
-      return result;
-    }
+  const blink = (stone: number, i: number): number => {
+    const cacheKey = `${stone}-${i}`;
+    if (stoneCache.has(cacheKey)) return stoneCache.get(cacheKey)!;
 
-    const stoneStr = `${stone}`;
-    if (stoneStr.length % 2 === 0) {
-      const len = stoneStr.length;
-      const left = +stoneStr.slice(0, len / 2);
-      const right = +stoneStr.slice(len / 2);
+    let result: number;
 
-      const leftResult = search(left, i - 1);
-      const rightResult = search(right, i - 1);
-      const result = leftResult + rightResult;
-      stoneCache.set(`${stone}-${i}`, result);
-      return result;
+    if (i === 0) return 1;
+    else if (stone === 0) result = blink(1, i - 1);
+    else {
+      const stoneStr = stone.toString();
+      if (stoneStr.length % 2 === 0) {
+        const mid = stoneStr.length >> 1;
+        const left = +stoneStr.substring(0, mid);
+        const right = +stoneStr.substring(mid);
+        result = blink(left, i - 1) + blink(right, i - 1);
+      } else result = blink(stone * 2024, i - 1);
     }
 
-    const result = search(stone * 2024, i - 1);
-    stoneCache.set(`${stone}-${i}`, result);
+    stoneCache.set(cacheKey, result);
     return result;
   };
 
-  let [p1, p2] = [0, 0];
-
-  for (let j = 0; j < stones.length; j++) {
-    p1 += search(stones[j], 25);
-  }
-  for (let j = 0; j < stones.length; j++) {
-    p2 += search(stones[j], 75);
-  }
+  const calculateSum = (amount: number) =>
+    stones.reduce((sum, stone) => sum + blink(stone, amount), 0);
 
   return {
-    part1: p1,
-    part2: p2,
+    part1: calculateSum(p1Blinks),
+    part2: calculateSum(p2Blinks),
   };
 };
