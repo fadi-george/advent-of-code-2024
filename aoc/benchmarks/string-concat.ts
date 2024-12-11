@@ -3,7 +3,6 @@ const str = "abcdefghijklmnopqrstuvwxyz".repeat(1000);
 const iterations = 10000;
 const pos = 5;
 const newChar = "O";
-const originalChar = str[pos];
 
 console.time("slice");
 for (let i = 0; i < iterations; i++) {

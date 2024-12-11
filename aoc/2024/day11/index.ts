@@ -11,11 +11,12 @@ export default (input: string, p1Blinks: number = 25, p2Blinks: number = 75) => 
     if (i === 0) return 1;
     else if (stone === 0) result = blink(1, i - 1);
     else {
-      const stoneStr = stone.toString();
-      if (stoneStr.length % 2 === 0) {
-        const mid = stoneStr.length >> 1;
-        const left = +stoneStr.substring(0, mid);
-        const right = +stoneStr.substring(mid);
+      const digits = Math.floor(Math.log10(stone)) + 1;
+
+      if (digits % 2 === 0) {
+        const divisor = Math.pow(10, digits >> 1);
+        const right = stone % divisor;
+        const left = Math.floor(stone / divisor);
         result = blink(left, i - 1) + blink(right, i - 1);
       } else result = blink(stone * 2024, i - 1);
     }
