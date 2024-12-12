@@ -52,28 +52,15 @@ const getPlotInfo = (grid: string[]) => {
       const side2 = grid[r2]?.[c2];
       const diag = grid[r3]?.[c3];
 
-      if (diag === ch && side1 !== ch && side2 !== ch) {
+      if (side1 !== ch && side2 !== ch) {
+        plots[ch][blockIndex].sides++;
+      } else if (
+        (ch === side1 && ch === side2 && diag !== ch) ||
+        (ch === diag && (side1 === ch || side2 === ch) && side1 !== side2)
+      ) {
         if (!cornerCounts[`${ch},${blockIndex}`]) cornerCounts[`${ch},${blockIndex}`] = 0;
         cornerCounts[`${ch},${blockIndex}`] += 1;
-      } else if (side1 !== ch && side2 !== ch) {
-        plots[ch][blockIndex].sides++;
       }
-      // let count = 1;
-
-      // const ch1 = grid[r1]?.[c1];
-      // const ch2 = grid[r2]?.[c2];
-      // const ch3 = grid[r3]?.[c3];
-      // const count = [ch1, ch2, ch3].reduce((a, gCh) => (ch === gCh ? a + 1 : a), 0) + 1;
-
-      // if (count % 2 === 1) {
-      //   if (count === 3) {
-      //     if (!cornerCounts[`${ch},${blockIndex}`])
-      //       cornerCounts[`${ch},${blockIndex}`] = 0;
-      //     cornerCounts[`${ch},${blockIndex}`] += 1;
-      //   } else {
-      //     plots[ch][blockIndex].sides++;
-      //   }
-      // }
     });
 
     DIRS.forEach(([dr, dc]) => {
