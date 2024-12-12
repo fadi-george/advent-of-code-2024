@@ -41,7 +41,7 @@ const getPlotInfo = (grid: string[]) => {
       if (side1 !== ch && side2 !== ch) {
         plots[ch][blockIndex].sides++;
       } else if (
-        // two same neighbors in corner direction
+        // inverse corner where corner direction has three of the same character
         (ch === side1 && ch === side2 && diag !== ch) ||
         (ch === diag && (side1 === ch || side2 === ch) && side1 !== side2)
       ) {
