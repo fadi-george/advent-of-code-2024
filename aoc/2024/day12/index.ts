@@ -24,7 +24,6 @@ const getPlotInfo = (grid: string[]) => {
   const visited = new Set<string>();
 
   const plots: PlotInfo = {};
-  const invCorners: Record<string, number> = {};
 
   const flood = (ch: string, r: number, c: number, blockIndex: number) => {
     if (visited.has(`${r},${c}`)) return;
@@ -40,14 +39,9 @@ const getPlotInfo = (grid: string[]) => {
       // no same neighbors in corner direction
       if (side1 !== ch && side2 !== ch) {
         plots[ch][blockIndex].sides++;
-      } else if (
-        // inverse corner where corner direction has three of the same character
-        (ch === side1 && ch === side2 && diag !== ch) ||
-        (ch === diag && (side1 === ch || side2 === ch) && side1 !== side2)
-      ) {
-        // inverse corners would be counted 3 times which we will adjust later
-        if (!invCorners[`${ch},${blockIndex}`]) invCorners[`${ch},${blockIndex}`] = 0;
-        invCorners[`${ch},${blockIndex}`] += 1;
+        // inverse corner where corner direction has three of the same character (L shape)
+      } else if (ch === side1 && ch === side2 && diag !== ch) {
+        plots[ch][blockIndex].sides++;
       }
     });
 
@@ -69,7 +63,6 @@ const getPlotInfo = (grid: string[]) => {
 
         const blockIndex = plots[ch].length - 1;
         flood(ch, i, j, blockIndex);
-        plots[ch][blockIndex].sides += (invCorners[`${ch},${blockIndex}`] ?? 0) / 3;
       }
     }
   }
