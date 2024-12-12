@@ -20,6 +20,7 @@ describe("day 12", () => {
     const input = readFile("aoc/2024/day12/sample3.txt");
     const result = solution(input);
     expect(result.part1).toBe(1930);
+    expect(result.part2).toBe(1206);
   });
 
   test("example input 4", () => {
@@ -38,6 +39,6 @@ describe("day 12", () => {
     const input = readFile("aoc/2024/day12/input.txt");
     const result = solution(input);
     expect(result.part1).toBe(1375574);
-    // expect(result.part2).toBe(1375574);
+    expect(result.part2).toBe(830566);
   });
 });

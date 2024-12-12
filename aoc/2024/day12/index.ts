@@ -3,8 +3,6 @@ import { DIRS } from "../../constants";
 export default (input: string) => {
   const grid = input.split("\n");
   const plots = getPlotInfo(grid);
-  console.table(grid);
-  console.log(plots);
   return {
     part1: getPrice(plots, false),
     part2: getPrice(plots, true),
@@ -94,16 +92,13 @@ const getPlotInfo = (grid: string[]) => {
   return plots;
 };
 
-const getPrice = (plots: PlotInfo, useSides: boolean) => {
-  return Object.entries(plots).reduce((acc, [ch, blocks]) => {
-    return (
+const getPrice = (plots: PlotInfo, useSides: boolean) =>
+  Object.entries(plots).reduce(
+    (acc, [, blocks]) =>
       acc +
-      blocks.reduce((acc, { area, perimeter, sides }) => {
-        return acc + (useSides ? sides : perimeter) * area;
-      }, 0)
-    );
-  }, 0);
-};
-
-// 1378316 too high
-1375574;
+      blocks.reduce(
+        (acc, { area, perimeter, sides }) => acc + (useSides ? sides : perimeter) * area,
+        0
+      ),
+    0
+  );
