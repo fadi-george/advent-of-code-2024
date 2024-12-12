@@ -3,6 +3,7 @@ import { DIRS } from "../../constants";
 export default (input: string) => {
   const grid = input.split("\n");
   const plots = getPlotInfo(grid);
+  console.table(grid);
   console.log(plots);
   const price = getPrice(plots);
 
