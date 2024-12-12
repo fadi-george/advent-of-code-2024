@@ -1,10 +1,7 @@
 import { DIRS } from "../../constants";
 
 // prettier-ignore
-const CORNER_OFFSETS = [[0, -1], [-1, 0], [-1, -1]]; // left, top, diagonal
-const ALL_CORNERS = [1, -1].flatMap((x) =>
-  [1, -1].map((y) => CORNER_OFFSETS.map(([r, c]) => [r * x, c * y]))
-);
+const ALL_CORNERS = [1, -1].flatMap((x) => [1, -1].map((y) => [[0, -1], [-1, 0], [-1, -1]].map(([r, c]) => [r * x, c * y])));
 type PlotInfo = { area: number; perimeter: number; sides: number };
 
 export default (input: string) => {
@@ -16,20 +13,15 @@ export default (input: string) => {
     visited.add(`${r},${c}`);
     info.area++;
 
-    // check sides and diagonal for each corner
-    ALL_CORNERS.forEach(([[dr1, dc1], [dr2, dc2], [dr3, dc3]]) => {
-      const [s1, s2, d] = [
-        grid[r + dr1]?.[c + dc1],
-        grid[r + dr2]?.[c + dc2],
-        grid[r + dr3]?.[c + dc3],
-      ];
+    // corners will have an L shape or have no matching sides
+    ALL_CORNERS.forEach((corner) => {
+      const [s1, s2, d] = corner.map(([dr, dc]) => grid[r + dr]?.[c + dc]);
       if ((s1 !== ch && s2 !== ch) || (ch === s1 && ch === s2 && d !== ch)) info.sides++;
     });
 
-    DIRS.forEach(([dr, dc]) => {
-      const [nr, nc] = [r + dr, c + dc]; // check matching blocks
-      grid[nr]?.[nc] === ch ? flood(ch, nr, nc, info) : info.perimeter++;
-    });
+    // go up, down, left, right checking for matching blocks
+    for (const [dr, dc] of DIRS)
+      grid[r + dr]?.[c + dc] === ch ? flood(ch, r + dr, c + dc, info) : info.perimeter++;
   };
 
   for (let i = 0; i < grid.length; i++)
