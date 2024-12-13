@@ -7,7 +7,7 @@
       "name": "Launch Server",
       "program": "${workspaceFolder}/server/src/index.ts",
       "request": "launch",
-      "runtimeArgs": ["--env-file", "${workspaceFolder}/server/.env"],
+      "runtimeArgs": ["--env-file", ".env"],
       "type": "bun"
     },
     {
@@ -22,7 +22,7 @@
       "name": "Bun Debug AoC",
       "program": "${workspaceFolder}/aoc/index.ts",
       "request": "launch",
-      "runtimeArgs": ["--env-file", "${workspaceFolder}/aoc/.env"],
+      "runtimeArgs": ["--env-file", ".env"],
       "type": "bun"
     },
     {
@@ -31,11 +31,7 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "runtimeArgs": [
-        "--experimental-strip-types",
-        "--env-file",
-        "${workspaceFolder}/aoc/.env"
-      ]
+      "runtimeArgs": ["--experimental-strip-types", "--env-file", ".env"]
     }
   ],
   "version": "0.2.0"

@@ -1,0 +1,21 @@
+import { describe, expect, test } from "bun:test";
+import { readFile } from "../../lib/file";
+import solution from "./index";
+
+const path = "aoc/2024/day13/";
+
+describe("day 13", () => {
+  test("example input", () => {
+    const input = readFile(`${path}sample.txt`);
+    const result = solution(input);
+    // expect(result.part1).toBe(140);
+    // expect(result.part2).toBe(80);
+  });
+
+  test("puzzle input", () => {
+    const input = readFile(`${path}input.txt`);
+    const result = solution(input);
+    // expect(result.part1).toBe(1375574);
+    // expect(result.part2).toBe(830566);
+  });
+});

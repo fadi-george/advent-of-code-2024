@@ -20,7 +20,7 @@ FILE=input YEAR=2024 DAY=1 bun aoc/index.ts
 Bun version: 1.1.36 is recommended for debugging.
 
 Can run the `Bun Debug AoC` launch config to run the script with debugging enabled.
-This will require setting the `FILE`, `YEAR`, and `DAY` in a `.env` file in the `aoc` folder. E.g.
+This will require setting the `FILE`, `YEAR`, and `DAY` in a `.env` file in the root folder. E.g.
 
 ```
 FILE=sample.txt
@@ -30,7 +30,7 @@ DAY=1
 
 ### Web App + Server
 
-Create an `.env` file in the server folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
+If you have not done so, create an `.env` file in the root folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
 You can grab your session cookie by looking at your headers in the network log on adventofcode.com.
 
 Run the hono backend server:

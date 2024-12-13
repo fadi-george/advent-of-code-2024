@@ -1,8 +1,12 @@
-import { readFile } from "./lib/file";
+import { downloadInput, readFile } from "./lib/file";
 
 const year = process.env.YEAR;
 const day = process.env.DAY?.padStart(2, "0");
 const fileName = process.env.FILE;
+
+if (!year || !day) throw new Error("YEAR and DAY must be set");
+
+await downloadInput(year, day);
 
 const runner = await import(`./${year}/day${day}/index.ts`);
 
