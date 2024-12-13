@@ -38,7 +38,7 @@ function RouteComponent() {
   return (
     <>
       {/* Stars Total */}
-      <div className="justify-end absolute top-6 right-7 hidden md:flex">
+      <div className="justify-end absolute top-6 right-7 hidden md:hidden ">
         <HoverCard>
           <HoverCardTrigger className="flex items-center gap-2 text-xl font-bold focus:outline-none cursor-default ">
             {totalStars}{" "}

@@ -1,7 +1,11 @@
 import { DIRS } from "../../constants";
 
 // prettier-ignore
-const ALL_CORNERS = [1, -1].flatMap((x) => [1, -1].map((y) => [[0, -1], [-1, 0], [-1, -1]].map(([r, c]) => [r * x, c * y])));
+const CORNER_OFFSET = [[0, -1], [-1, 0], [-1, -1]]; // left, top, top-left (diagonal)
+const ALL_CORNERS = [1, -1].flatMap(
+  (x) => [1, -1].map((y) => CORNER_OFFSET.map(([r, c]) => [r * x, c * y])) // offsets for each corner
+);
+
 type PlotInfo = { area: number; perimeter: number; sides: number };
 
 export default (input: string) => {
