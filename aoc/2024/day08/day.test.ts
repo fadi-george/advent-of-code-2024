@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readFile } from "../../lib/file";
+import { readFile } from "../../lib/general";
 import solution from "./index";
 
 describe("day 8", () => {

@@ -25,3 +25,28 @@ export const downloadInput = async (year: string, day: string) => {
     fs.writeFileSync(inputPath, text);
   }
 };
+
+export const submit = async ({
+  answer,
+  day,
+  level,
+  year,
+}: {
+  answer: string;
+  day: string;
+  level: "1" | "2";
+  year: string;
+}) => {
+  const response = await fetch(`https://adventofcode.com/${year}/day/${day}/answer`, {
+    method: "POST",
+    body: new URLSearchParams({ level, answer }),
+    headers: {
+      Cookie: process.env.AOC_SESSION_COOKIE || "",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  const text = await response.text();
+  const dom = new DOMParser().parseFromString(text, "text/html");
+  return dom.body.textContent?.includes("That's the right answer!");
+};
