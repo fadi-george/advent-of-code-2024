@@ -20,4 +20,5 @@ export const get2DIndex = (index: number, width: number) => [
   index % width,
 ];
 
-export {};
+export const wrap = (value: number, min: number, max: number) =>
+  (((value % (max - min)) + max) % max) - min;
