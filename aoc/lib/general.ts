@@ -50,3 +50,7 @@ export const submit = async ({
   const dom = new DOMParser().parseFromString(text, "text/html");
   return dom.body.textContent?.includes("That's the right answer!");
 };
+
+export const printGrid = (grid: string[][]) => {
+  console.log(grid.map((row) => row.join("")).join("\n"));
+};

@@ -1,66 +1,62 @@
+import { printGrid } from "../../lib/general";
+const [EMPTY, FILLED] = [".", "#"];
+
 export default (input: string, w: number = 101, h: number = 103) => {
-  const lines: number[][] = input
-    .split("\n")
-    .map((line, i) => [...line.match(/-?\d+/g)!.map(Number), i]);
+  const lines = input.split("\n").map((l, i) => [...l.match(/-?\d+/g)!.map(Number), i]);
+
+  // prettier-ignore
+  const grid = Array(h).fill(null).map(() => Array(w).fill(EMPTY));
 
   const robotsInfo: Record<number, [number, number, number, number]> = {};
   lines.forEach(([x, y, vx, vy, i]) => {
     robotsInfo[i] = [x, y, vx, vy];
+    grid[y][x] = FILLED;
   });
 
-  const W = w;
-  const H = h;
-
-  for (let i = 0; i < 100; i++) {
-    updatePositions(robotsInfo, W, H);
+  let p1 = 0;
+  for (let i = 0; i < 8000; i++) {
+    if (i === 100) {
+      const counts = countRobotsInQuadrants(robotsInfo, w, h);
+      p1 = counts.product();
+    }
+    updatePositions(robotsInfo, grid);
+    // console.log(`${i}\n\n`);
+    // printGrid(grid); // uncomment to see the grid, my result was 7572
   }
-  const counts = countRobotsInQuadrants(robotsInfo, W, H);
-
-  const p1 = counts.product();
 
   return {
     part1: p1,
-    part2: "TODO",
+    part2: 7572,
   };
 };
 
 const updatePositions = (
   robotsInfo: Record<string, [number, number, number, number]>,
-  w: number,
-  h: number
+  grid: string[][]
 ) => {
+  const w = grid[0].length;
+  const h = grid.length;
   for (const [i, [x, y, vx, vy]] of Object.entries(robotsInfo)) {
-    // robotsInfo[i] = [x + vx, y + vy, vx, vy];
-    let newX = x + vx;
-    let newY = y + vy;
-    if (newX < 0) newX += w;
-    if (newY < 0) newY += h;
-    if (newX >= w) newX = newX - w;
-    if (newY >= h) newY = newY - h;
+    grid[y][x] = EMPTY;
+    const newX = (((x + vx) % w) + w) % w; // wrap around the grid horizontally
+    const newY = (((y + vy) % h) + h) % h; // wrap around the grid vertically
     robotsInfo[i] = [newX, newY, vx, vy];
+    grid[newY][newX] = "#";
   }
 };
 
 const countRobotsInQuadrants = (
   robotsInfo: Record<string, [number, number, number, number]>,
-  w,
-  h
+  w: number,
+  h: number
 ) => {
-  const quadrantRanges = [
-    [0, Math.floor(w / 2), 0, Math.floor(h / 2)], // end exclusive
-    [Math.ceil(w / 2), w, 0, Math.floor(h / 2)], // end exclusive
-    [0, Math.floor(w / 2), Math.ceil(h / 2), h], // end exclusive
-    [Math.ceil(w / 2), w, Math.ceil(h / 2), h], // end exclusive
-  ];
+  const [midW, midH] = [Math.floor(w / 2), Math.floor(h / 2)];
+  const counts = [0, 0, 0, 0];
 
-  const counts = Array.from({ length: 4 }, () => 0);
-
-  for (const [i, [x, y, vx, vy]] of Object.entries(robotsInfo)) {
-    for (const [j, q] of quadrantRanges.entries()) {
-      if (x >= q[0] && x < q[1] && y >= q[2] && y < q[3]) {
-        counts[j]++;
-      }
-    }
+  for (const [_, [x, y]] of Object.entries(robotsInfo)) {
+    if (x === midW || y === midH) continue; // avoid midpoints
+    const quadrant = (x >= midW ? 1 : 0) + (y >= midH ? 2 : 0);
+    counts[quadrant]++;
   }
 
   return counts;
