@@ -53,4 +53,5 @@ export const submit = async ({
 
 export const printGrid = (grid: string[][]) => {
   console.log(grid.map((row) => row.join("")).join("\n"));
+  console.log("\n");
 };
