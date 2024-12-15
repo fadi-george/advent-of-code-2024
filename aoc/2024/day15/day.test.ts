@@ -143,7 +143,7 @@ describe("day 15", () => {
   test("puzzle input", () => {
     const input = readFile(`${path}input.txt`);
     const result = solution(input);
-    // expect(result.part1).toBe(1577255);
-    // expect(result.part2).toBe(7572);
+    expect(result.part1).toBe(1577255);
+    expect(result.part2).toBe(1597035);
   });
 });

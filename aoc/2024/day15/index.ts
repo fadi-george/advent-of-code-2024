@@ -7,6 +7,8 @@ const chMap = {
   "@": ["@", "."],
 };
 
+type Grid = string[][];
+
 export default (input: string) => {
   const [gridLines, moveLines] = input.split("\n\n");
   const moves = moveLines.replace(/\n/g, "");
@@ -33,13 +35,13 @@ export default (input: string) => {
   };
 };
 
-export const findRobot = (grid: string[][]) => {
+export const findRobot = (grid: Grid) => {
   const r = grid.findIndex((line) => line.includes("@"));
   const c = grid[r].indexOf("@");
   return [r, c];
 };
 
-export const moveRobot = (grid: string[][], r: number, c: number, move: string) => {
+export const moveRobot = (grid: Grid, r: number, c: number, move: string) => {
   const [w, h] = [grid[0].length, grid.length];
   const moves = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
   const [dr, dc] = moves[move as keyof typeof moves];
@@ -92,15 +94,10 @@ export const moveRobot = (grid: string[][], r: number, c: number, move: string) 
   // check if big box is blocked
   if (move === "^" || move === "v") {
     blockVisited.clear();
-    // console.table(grid);
-    const blocked = isBlocked(grid, move === "^" ? r - 1 : r + 1, c, move);
-    if (blocked) {
-      return [r, c];
-    }
+    if (isBlocked(grid, move === "^" ? r - 1 : r + 1, c, move)) return [r, c];
   }
 
-  // otherwise big box
-  moveBigBox(grid, r, c, freeI, move);
+  moveBigBox(grid, r, c, freeI, move); // otherwise move big box
   visited.clear();
 
   return [r + dr, c + dc];
@@ -149,90 +146,50 @@ const isBlocked = (grid: string[][], r: number, c: number, move: string) => {
 };
 
 const visited = new Set<string>();
-
-const findTouchingBoxes = (grid: string[][], r: number, c: number, dr: number) => {
+const findTouchingBoxes = (grid: Grid, r: number, c: number, dr: number): number[][] => {
   const key = `${r},${c}`;
   if (visited.has(key)) return [];
   visited.add(key);
 
-  const touchingBoxes: number[][] = [];
   const ch = grid[r][c];
   if (ch === ".") return [[r, c]];
-  if (ch === "]") {
-    touchingBoxes.push(
-      [r, c],
-      ...findTouchingBoxes(grid, r, c - 1, dr),
-      ...findTouchingBoxes(grid, r + dr, c, dr)
-    );
-  }
-  if (ch === "[") {
-    touchingBoxes.push(
-      [r, c],
-      ...findTouchingBoxes(grid, r, c + 1, dr),
-      ...findTouchingBoxes(grid, r + dr, c, dr)
-    );
-  }
-  return touchingBoxes;
+
+  const next = ch === "]" ? c - 1 : ch === "[" ? c + 1 : null;
+  if (next === null) return [];
+
+  return [
+    [r, c],
+    ...findTouchingBoxes(grid, r, next, dr),
+    ...findTouchingBoxes(grid, r + dr, c, dr),
+  ];
 };
 
 export const moveBigBox = (
-  grid: string[][],
+  grid: Grid,
   r: number,
   c: number,
   freeI: number,
   move: string
 ) => {
-  switch (move) {
-    case "^": {
-      // find all touching boxes indices
-      const touchingBoxes = findTouchingBoxes(grid, r - 1, c, -1).sort(
-        (a, b) => a[0] - b[0]
-      );
-      for (const [i, j] of touchingBoxes)
-        grid[i][j] = visited.has(`${i + 1},${j}`) ? grid[i + 1][j] : ".";
-      grid[r - 1][c] = "@";
-      break;
-    }
+  if (move === "^" || move === "v") {
+    const dr = move === "^" ? -1 : 1;
+    const boxes = findTouchingBoxes(grid, r + dr, c, dr);
 
-    case "v": {
-      const touchingBoxes = findTouchingBoxes(grid, r + 1, c, 1).sort(
-        (a, b) => b[0] - a[0]
-      );
-      for (const [i, j] of touchingBoxes)
-        grid[i][j] = visited.has(`${i - 1},${j}`) ? grid[i - 1][j] : ".";
-      grid[r + 1][c] = "@";
-      break;
-    }
+    for (const [i, j] of boxes)
+      grid[i][j] = visited.has(`${i - dr},${j}`) ? grid[i - dr][j] : "."; // move boxes
 
-    case ">": {
-      for (let i = freeI; i >= c; i--) {
-        grid[r][i] = grid[r][i - 1];
-      }
-      break;
-    }
+    grid[r + dr][c] = "@"; // move robot
+  } else
+    for (let i = freeI; i + (move === ">" ? 1 : -1) !== c; i += move === ">" ? -1 : 1)
+      grid[r][i] = grid[r][i + (move === ">" ? -1 : 1)];
 
-    case "<": {
-      for (let i = freeI; i <= c; i++) {
-        grid[r][i] = grid[r][i + 1];
-      }
-      break;
-    }
-  }
   grid[r][c] = ".";
 };
 
-const getBoxCoord = (grid: string[][]) => {
-  const [w, h] = [grid[0].length, grid.length];
-  const boxCoord = [];
-  for (let r = 0; r < h; r++) {
-    for (let c = 0; c < w; c++) {
-      if (grid[r][c] === "O" || grid[r][c] === "[") {
-        boxCoord.push([r, c]);
-      }
-    }
-  }
-  return boxCoord;
-};
+const getBoxCoord = (grid: string[][]) =>
+  grid
+    .flatMap((row, r) => row.map((ch, c) => (ch === "O" || ch === "[" ? [r, c] : null)))
+    .filter(Boolean) as number[][];
 
 const sumBoxCoord = (coords: number[][]) =>
   coords.reduce((acc, [r, c]) => acc + 100 * r + c, 0);
