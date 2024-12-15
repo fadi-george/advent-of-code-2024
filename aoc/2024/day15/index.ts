@@ -18,111 +18,12 @@ export default (input: string) => {
   let c = sC;
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
-    let dr = 0;
-    let dc = 0;
-
-    switch (move) {
-      case "^":
-        dr = -1;
-        break;
-      case "v":
-        dr = 1;
-        break;
-      case "<":
-        dc = -1;
-        break;
-      case ">":
-        dc = 1;
-        break;
-    }
-
-    const ch = grid[r + dr]?.[c + dc];
-    // console.log(`Move ${i + 1}: ${move}`);
-    if (ch === "#") {
-    } else if (ch === ".") {
-      // free space
-      grid[r][c] = ".";
-      r += dr;
-      c += dc;
-      grid[r][c] = "@";
-    } else if (ch === "O") {
-      let freeI = -1;
-
-      switch (move) {
-        case "^":
-          for (let i = r; i > 0; i--) {
-            if (grid[i][c] === ".") {
-              freeI = i;
-              break;
-            } else if (grid[i][c] === "#") {
-              break;
-            }
-          }
-          if (freeI === -1) continue;
-
-          // shift everything up
-          for (let i = freeI; i <= r; i++) {
-            grid[i][c] = grid[i + 1][c];
-          }
-          grid[r][c] = ".";
-          r--;
-          break;
-        case "v":
-          for (let i = r; i < h; i++) {
-            if (grid[i][c] === ".") {
-              freeI = i;
-              break;
-            } else if (grid[i][c] === "#") {
-              break;
-            }
-          }
-          if (freeI === -1) continue;
-
-          for (let i = freeI; i >= r; i--) {
-            grid[i][c] = grid[i - 1][c];
-          }
-          grid[r][c] = ".";
-          r++;
-          break;
-        case "<":
-          for (let i = c; i >= 0; i--) {
-            if (grid[r][i] === ".") {
-              freeI = i;
-              break;
-            } else if (grid[r][i] === "#") {
-              break;
-            }
-          }
-          if (freeI === -1) continue;
-
-          for (let i = freeI; i <= c; i++) {
-            grid[r][i] = grid[r][i + 1];
-          }
-          grid[r][c] = ".";
-          c--;
-          break;
-        case ">":
-          for (let i = c; i < w; i++) {
-            if (grid[r][i] === ".") {
-              freeI = i;
-              break;
-            } else if (grid[r][i] === "#") {
-              break;
-            }
-          }
-          if (freeI === -1) continue;
-
-          for (let i = freeI; i >= c; i--) {
-            grid[r][i] = grid[r][i - 1];
-          }
-          grid[r][c] = ".";
-          c++;
-          break;
-      }
-    }
-
-    // printGrid(grid);
+    const [newR, newC] = moveRobot(grid, r, c, move);
+    r = newR;
+    c = newC;
   }
+
+  // printGrid(grid);
 
   const coords = getBoxCoord(grid);
   const p1 = coords.reduce((acc, [r, c]) => acc + 100 * r + c, 0);
@@ -132,6 +33,115 @@ export default (input: string) => {
     part1: p1,
     part2: "TODO",
   };
+};
+
+const moveRobot = (grid: string[][], r: number, c: number, move: string) => {
+  const [w, h] = [grid[0].length, grid.length];
+  const ret = [r, c];
+
+  let dr = 0;
+  let dc = 0;
+
+  switch (move) {
+    case "^":
+      dr = -1;
+      break;
+    case "v":
+      dr = 1;
+      break;
+    case "<":
+      dc = -1;
+      break;
+    case ">":
+      dc = 1;
+      break;
+  }
+
+  const ch = grid[r + dr]?.[c + dc];
+  // console.log(`Move ${i + 1}: ${move}`);
+  if (ch === "#") {
+  } else if (ch === ".") {
+    // free space
+    grid[r][c] = ".";
+    r += dr;
+    c += dc;
+    grid[r][c] = "@";
+  } else if (ch === "O") {
+    let freeI = -1;
+
+    switch (move) {
+      case "^":
+        for (let i = r; i > 0; i--) {
+          if (grid[i][c] === ".") {
+            freeI = i;
+            break;
+          } else if (grid[i][c] === "#") {
+            break;
+          }
+        }
+        if (freeI === -1) return ret;
+
+        // shift everything up
+        for (let i = freeI; i <= r; i++) {
+          grid[i][c] = grid[i + 1][c];
+        }
+        grid[r][c] = ".";
+        r--;
+        break;
+      case "v":
+        for (let i = r; i < h; i++) {
+          if (grid[i][c] === ".") {
+            freeI = i;
+            break;
+          } else if (grid[i][c] === "#") {
+            break;
+          }
+        }
+        if (freeI === -1) return ret;
+
+        for (let i = freeI; i >= r; i--) {
+          grid[i][c] = grid[i - 1][c];
+        }
+        grid[r][c] = ".";
+        r++;
+        break;
+      case "<":
+        for (let i = c; i >= 0; i--) {
+          if (grid[r][i] === ".") {
+            freeI = i;
+            break;
+          } else if (grid[r][i] === "#") {
+            break;
+          }
+        }
+        if (freeI === -1) return ret;
+
+        for (let i = freeI; i <= c; i++) {
+          grid[r][i] = grid[r][i + 1];
+        }
+        grid[r][c] = ".";
+        c--;
+        break;
+      case ">":
+        for (let i = c; i < w; i++) {
+          if (grid[r][i] === ".") {
+            freeI = i;
+            break;
+          } else if (grid[r][i] === "#") {
+            break;
+          }
+        }
+        if (freeI === -1) return ret;
+
+        for (let i = freeI; i >= c; i--) {
+          grid[r][i] = grid[r][i - 1];
+        }
+        grid[r][c] = ".";
+        c++;
+        break;
+    }
+  }
+  return [r, c];
 };
 
 const getBoxCoord = (grid: string[][]) => {
