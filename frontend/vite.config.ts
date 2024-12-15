@@ -15,7 +15,7 @@ export default defineConfig({
     TanStackRouterVite(),
   ],
   server: {
-    port: 3000,
+    port: 3001,
     open: true,
     proxy: {
       "/api": {

@@ -1,12 +1,5 @@
-import { printGrid } from "../../lib/general";
-
-const chMap = {
-  ".": [".", "."],
-  O: ["[", "]"],
-  "#": ["#", "#"],
-  "@": ["@", "."],
-};
-
+const chMap = { ".": [".", "."], O: ["[", "]"], "#": ["#", "#"], "@": ["@", "."] };
+const moves = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
 type Grid = string[][];
 
 export default (input: string) => {
@@ -15,10 +8,8 @@ export default (input: string) => {
 
   const grid = gridLines.split("\n").map((line) => line.split(""));
   const grid2 = grid.map((l) => l.flatMap((c) => chMap[c as keyof typeof chMap]));
-
-  const [sR, sC] = findRobot(grid);
-  const [sR2, sC2] = findRobot(grid2);
-  let [r, c, r2, c2] = [sR, sC, sR2, sC2];
+  let [r, c] = findRobot(grid);
+  let [r2, c2] = findRobot(grid2);
 
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
@@ -26,29 +17,22 @@ export default (input: string) => {
     [r2, c2] = moveRobot(grid2, r2, c2, move);
   }
 
-  const p1 = sumCoords(getBoxCoord(grid));
-  const p2 = sumCoords(getBoxCoord(grid2));
-
   return {
-    part1: p1,
-    part2: p2,
+    part1: sumCoords(getBoxCoord(grid)),
+    part2: sumCoords(getBoxCoord(grid2)),
   };
 };
 
 export const findRobot = (grid: Grid) => {
   const r = grid.findIndex((line) => line.includes("@"));
-  const c = grid[r].indexOf("@");
-  return [r, c];
+  return [r, grid[r].indexOf("@")];
 };
 
 export const moveRobot = (grid: Grid, r: number, c: number, move: string) => {
-  const [w, h] = [grid[0].length, grid.length];
-  const moves = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
   const [dr, dc] = moves[move as keyof typeof moves];
   const ch = grid[r + dr]?.[c + dc];
 
   if (ch === "#") return [r, c];
-
   if (ch === ".") {
     grid[r][c] = ".";
     grid[r + dr][c + dc] = "@";
@@ -58,7 +42,7 @@ export const moveRobot = (grid: Grid, r: number, c: number, move: string) => {
   const isVertical = move === "^" || move === "v";
   const reverse = move === "^" || move === "<";
   const pos = isVertical ? r : c;
-  const dim = isVertical ? h : w;
+  const dim = isVertical ? grid.length : grid[0].length;
 
   let freeI = -1;
   for (let i = pos; reverse ? i >= 0 : i < dim; i += reverse ? -1 : 1) {
@@ -73,33 +57,27 @@ export const moveRobot = (grid: Grid, r: number, c: number, move: string) => {
   if (freeI === -1) return [r, c];
 
   if (ch === "O") {
-    const start = Math.min(freeI, pos);
-    const end = Math.max(freeI, pos);
+    const [start, end] = [Math.min(freeI, pos), Math.max(freeI, pos)];
     for (
       let i = reverse ? start : end;
       reverse ? i <= end : i >= start;
       i += reverse ? 1 : -1
     ) {
-      if (isVertical) {
-        grid[i][c] = grid[i + (reverse ? 1 : -1)][c];
-      } else {
-        grid[r][i] = grid[r][i + (reverse ? 1 : -1)];
-      }
+      isVertical
+        ? (grid[i][c] = grid[i + (reverse ? 1 : -1)][c])
+        : (grid[r][i] = grid[r][i + (reverse ? 1 : -1)]);
     }
-
     grid[r][c] = ".";
     return [r + dr, c + dc];
   }
 
-  // check if big box is blocked
   if (move === "^" || move === "v") {
     blockVisited.clear();
     if (isBlocked(grid, move === "^" ? r - 1 : r + 1, c, move)) return [r, c];
   }
 
-  moveBigBox(grid, r, c, freeI, move); // otherwise move big box
   visited.clear();
-
+  moveBigBox(grid, r, c, freeI, move);
   return [r + dr, c + dc];
 };
 
@@ -109,38 +87,14 @@ const isBlocked = (grid: string[][], r: number, c: number, move: string) => {
   if (blockVisited.has(key)) return false;
   blockVisited.add(key);
 
-  switch (move) {
-    case "^":
-      for (let i = r; i >= 0; i--) {
-        if (grid[i][c] === "#") return true;
-        if (grid[i][c] === "]") {
-          // check left side of box
-          if (isBlocked(grid, i, c - 1, move)) {
-            return true;
-          }
-        }
-        if (grid[i][c] === "[") {
-          // check right side of box
-          if (isBlocked(grid, i, c + 1, move)) {
-            return true;
-          }
-        }
-        if (grid[i][c] === ".") break;
-      }
-      break;
+  const [start, end, step] = move === "^" ? [r, 0, -1] : [r, grid.length, 1];
 
-    case "v":
-      for (let i = r; i < grid.length; i++) {
-        if (grid[i][c] === "#") return true;
-        if (grid[i][c] === "]") {
-          if (isBlocked(grid, i, c - 1, move)) return true;
-        }
-        if (grid[i][c] === "[") {
-          if (isBlocked(grid, i, c + 1, move)) return true;
-        }
-        if (grid[i][c] === ".") break;
-      }
-      break;
+  // check if current box or boxes in front of it are blocked
+  for (let i = start; move === "^" ? i >= end : i < end; i += step) {
+    if (grid[i][c] === "#") return true;
+    if (grid[i][c] === "]" && isBlocked(grid, i, c - 1, move)) return true;
+    if (grid[i][c] === "[" && isBlocked(grid, i, c + 1, move)) return true;
+    if (grid[i][c] === ".") break;
   }
   return false;
 };
@@ -165,55 +119,34 @@ const findTouchingBoxes = (grid: Grid, r: number, c: number, dr: number): number
 };
 
 export const moveBigBox = (
-  grid: string[][],
+  grid: Grid,
   r: number,
   c: number,
   freeI: number,
   move: string
 ) => {
-  switch (move) {
-    case "^": {
-      // find all touching boxes indices
-      const touchingBoxes = findTouchingBoxes(grid, r - 1, c, -1).sort(
-        (a, b) => a[0] - b[0]
-      );
-      for (const [i, j] of touchingBoxes)
-        grid[i][j] = visited.has(`${i + 1},${j}`) ? grid[i + 1][j] : ".";
-      grid[r - 1][c] = "@";
-      break;
-    }
+  // move one or multiple boxes in front of robot
+  if (move === "^" || move === "v") {
+    const [dr, sortDir] = move === "^" ? [-1, 1] : [1, -1];
+    const touchingBoxes = findTouchingBoxes(grid, r + dr, c, dr).sort(
+      (a, b) => (a[0] - b[0]) * sortDir
+    );
+    for (const [i, j] of touchingBoxes)
+      grid[i][j] = visited.has(`${i - dr},${j}`) ? grid[i - dr][j] : ".";
+    grid[r + dr][c] = "@";
 
-    case "v": {
-      const touchingBoxes = findTouchingBoxes(grid, r + 1, c, 1).sort(
-        (a, b) => b[0] - a[0]
-      );
-      for (const [i, j] of touchingBoxes)
-        grid[i][j] = visited.has(`${i - 1},${j}`) ? grid[i - 1][j] : ".";
-      grid[r + 1][c] = "@";
-      break;
-    }
-
-    case ">": {
-      for (let i = freeI; i >= c; i--) {
-        grid[r][i] = grid[r][i - 1];
-      }
-      break;
-    }
-
-    case "<": {
-      for (let i = freeI; i <= c; i++) {
-        grid[r][i] = grid[r][i + 1];
-      }
-      break;
-    }
+    // move row of boxes to the next free position
+  } else {
+    const dir = move === "<" ? 1 : -1;
+    for (let i = freeI; i * dir <= c * dir; i += dir)
+      grid[r][i] = grid[r][i + (move === "<" ? 1 : -1)];
   }
   grid[r][c] = ".";
 };
 
-const getBoxCoord = (grid: string[][]) =>
+const getBoxCoord = (grid: Grid) =>
   grid
     .flatMap((row, r) => row.map((ch, c) => (ch === "O" || ch === "[" ? [r, c] : null)))
     .filter(Boolean) as number[][];
 
-const sumCoords = (coords: number[][]) =>
-  coords.reduce((a, [r, c]) => a + 100 * r + c, 0);
+const sumCoords = (arr: number[][]) => arr.reduce((a, [r, c]) => a + 100 * r + c, 0);
