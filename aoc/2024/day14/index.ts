@@ -1,4 +1,4 @@
-import { wrap } from "../../lib/array";
+import { product, wrap } from "../../lib/array";
 import { printGrid } from "../../lib/general";
 const [EMPTY, FILLED, W, H] = [" ", "#", 101, 103];
 
@@ -18,7 +18,7 @@ export default (input: string) => {
     }
     if (i === 100) {
       const counts = countRobotsInQuadrants(robots, W, H);
-      p1 = counts.product();
+      p1 = product(counts);
     }
     updatePositions(robots, grid);
   }

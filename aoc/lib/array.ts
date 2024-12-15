@@ -5,13 +5,9 @@ declare global {
   }
 }
 
-Array.prototype.sum = function () {
-  return this.reduce((acc, curr) => acc + curr, 0);
-};
+export const sum = (arr: number[]) => arr.reduce((acc, curr) => acc + curr, 0);
 
-Array.prototype.product = function () {
-  return this.reduce((acc, curr) => acc * curr, 1);
-};
+export const product = (arr: number[]) => arr.reduce((acc, curr) => acc * curr, 1);
 
 export const get1DIndex = (r: number, c: number, width: number) => r * width + c;
 
