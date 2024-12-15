@@ -1,33 +1,36 @@
 import { printGrid } from "../../lib/general";
 
+const chMap = {
+  ".": [".", "."],
+  O: ["[", "]"],
+  "#": ["#", "#"],
+  "@": ["@", "."],
+};
+
 export default (input: string) => {
-  const [gridLines, moves] = input.split("\n\n");
+  const [gridLines, moveLines] = input.split("\n\n");
+  const moves = moveLines.replace(/\n/g, "");
+
   const grid = gridLines.split("\n").map((line) => line.split(""));
-  const sR = grid.findIndex((line) => line.includes("@"));
-  const sC = grid[sR].indexOf("@");
-  // const moves = moveLines;
+  const grid2 = grid.map((l) => l.flatMap((c) => chMap[c as keyof typeof chMap]));
 
-  // console.log({
-  //   grid,
-  //   moves,
-  // });
+  const [sR, sC] = findRobot(grid);
+  const [sR2, sC2] = findRobot(grid2);
+  let [r, c, r2, c2] = [sR, sC, sR2, sC2];
+
   printGrid(grid);
-  const [w, h] = [grid[0].length, grid.length];
+  printGrid(grid2);
 
-  let r = sR;
-  let c = sC;
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
-    const [newR, newC] = moveRobot(grid, r, c, move);
-    r = newR;
-    c = newC;
+    [r, c] = moveRobot(grid, r, c, move);
+    // [r2, c2] = moveRobot(grid2, r2, c2, move);
   }
 
-  // printGrid(grid);
+  printGrid(grid);
 
-  const coords = getBoxCoord(grid);
-  const p1 = coords.reduce((acc, [r, c]) => acc + 100 * r + c, 0);
-  // console.log({ coords });
+  const p1 = sumBoxCoord(getBoxCoord(grid));
+  // const p2 = sumBoxCoord(getBoxCoord(grid2));
 
   return {
     part1: p1,
@@ -35,113 +38,118 @@ export default (input: string) => {
   };
 };
 
+const findRobot = (grid: string[][]) => {
+  const r = grid.findIndex((line) => line.includes("@"));
+  const c = grid[r].indexOf("@");
+  return [r, c];
+};
+
 const moveRobot = (grid: string[][], r: number, c: number, move: string) => {
   const [w, h] = [grid[0].length, grid.length];
-  const ret = [r, c];
+  const moves = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
+  const [dr, dc] = moves[move as keyof typeof moves];
+  const ch = grid[r + dr]?.[c + dc];
 
-  let dr = 0;
-  let dc = 0;
+  if (ch === "#") return [r, c];
 
-  switch (move) {
-    case "^":
-      dr = -1;
-      break;
-    case "v":
-      dr = 1;
-      break;
-    case "<":
-      dc = -1;
-      break;
-    case ">":
-      dc = 1;
-      break;
+  if (ch === ".") {
+    grid[r][c] = ".";
+    grid[r + dr][c + dc] = "@";
+    return [r + dr, c + dc];
   }
 
-  const ch = grid[r + dr]?.[c + dc];
-  // console.log(`Move ${i + 1}: ${move}`);
-  if (ch === "#") {
-  } else if (ch === ".") {
-    // free space
-    grid[r][c] = ".";
-    r += dr;
-    c += dc;
-    grid[r][c] = "@";
-  } else if (ch === "O") {
-    let freeI = -1;
+  // O or [ or ]
+  const isVertical = move === "^" || move === "v";
+  const reverse = move === "^" || move === "<";
+  const pos = isVertical ? r : c;
+  const dim = isVertical ? h : w;
 
-    switch (move) {
-      case "^":
-        for (let i = r; i > 0; i--) {
-          if (grid[i][c] === ".") {
-            freeI = i;
-            break;
-          } else if (grid[i][c] === "#") {
-            break;
-          }
-        }
-        if (freeI === -1) return ret;
-
-        // shift everything up
-        for (let i = freeI; i <= r; i++) {
-          grid[i][c] = grid[i + 1][c];
-        }
-        grid[r][c] = ".";
-        r--;
-        break;
-      case "v":
-        for (let i = r; i < h; i++) {
-          if (grid[i][c] === ".") {
-            freeI = i;
-            break;
-          } else if (grid[i][c] === "#") {
-            break;
-          }
-        }
-        if (freeI === -1) return ret;
-
-        for (let i = freeI; i >= r; i--) {
-          grid[i][c] = grid[i - 1][c];
-        }
-        grid[r][c] = ".";
-        r++;
-        break;
-      case "<":
-        for (let i = c; i >= 0; i--) {
-          if (grid[r][i] === ".") {
-            freeI = i;
-            break;
-          } else if (grid[r][i] === "#") {
-            break;
-          }
-        }
-        if (freeI === -1) return ret;
-
-        for (let i = freeI; i <= c; i++) {
-          grid[r][i] = grid[r][i + 1];
-        }
-        grid[r][c] = ".";
-        c--;
-        break;
-      case ">":
-        for (let i = c; i < w; i++) {
-          if (grid[r][i] === ".") {
-            freeI = i;
-            break;
-          } else if (grid[r][i] === "#") {
-            break;
-          }
-        }
-        if (freeI === -1) return ret;
-
-        for (let i = freeI; i >= c; i--) {
-          grid[r][i] = grid[r][i - 1];
-        }
-        grid[r][c] = ".";
-        c++;
-        break;
+  let freeI = -1;
+  for (let i = pos; reverse ? i >= 0 : i < dim; i += reverse ? -1 : 1) {
+    const ch = isVertical ? grid[i][c] : grid[r][i];
+    if (ch === "#") break;
+    if (ch === ".") {
+      freeI = i;
+      break;
     }
   }
+
+  if (freeI === -1) return [r, c];
+
+  const start = Math.min(freeI, pos);
+  const end = Math.max(freeI, pos);
+  for (
+    let i = reverse ? start : end;
+    reverse ? i <= end : i >= start;
+    i += reverse ? 1 : -1
+  ) {
+    if (isVertical) {
+      grid[i][c] = grid[i + (reverse ? 1 : -1)][c];
+    } else {
+      grid[r][i] = grid[r][i + (reverse ? 1 : -1)];
+    }
+  }
+
+  grid[r][c] = ".";
+  return [r + dr, c + dc];
+  // }
+  // if (ch === "[" || ch === "]") {
+  //   const rowInds = [];
+  //   let freeI = -1;
+  //   switch (move) {
+  //     case "^":
+  //       for (let i = r; i >= 0; i--) {
+  //         if (grid[i][c] === "#") break;
+  //         if (grid[i][c] === ".") {
+  //           freeI = i;
+  //           break;
+  //         }
+  //       }
+  //       if (freeI === -1) return [r, c];
+
+  //       for (let i = r + 1; i >= freeI; i--) {
+  //         if (isColumnUpBlocked(grid, i, c)) return [r, c];
+  //       }
+
+  //       grid[r][c] = ".";
+  //       grid[freeI][c] = "[";
+  //       return [freeI, c];
+  //     case "v":
+  //       break;
+  //     case "<":
+  //       break;
+  //     case ">":
+  //       break;
+  //   }
+  // }
+
   return [r, c];
+};
+
+const isColumnUpBlocked = (grid: string[][], r: number, c: number) => {
+  for (let i = r; i > 0; i--) {
+    if (grid[i][c] === "#") return true;
+    if (grid[i][c] === "]") {
+      // check left side of box
+      if (isColumnUpBlocked(grid, i, c - 1)) return true;
+    }
+    if (grid[i][c] === "[") {
+      // check right side of box
+      if (isColumnUpBlocked(grid, i, c + 1)) return true;
+    }
+  }
+  return false;
+};
+const moveBigBoxUp = (grid: string[][], r: number, c: number, i: number) => {
+  for (let j = i; j <= r; j++) {
+    if (grid[j][c] === "]") {
+      moveBigBoxUp(grid, j, c - 1, i);
+    }
+    if (grid[j][c] === "[") {
+      moveBigBoxUp(grid, j, c + 1, i);
+    }
+    grid[j][c] = grid[j + 1][c];
+  }
 };
 
 const getBoxCoord = (grid: string[][]) => {
@@ -156,6 +164,9 @@ const getBoxCoord = (grid: string[][]) => {
   }
   return boxCoord;
 };
+
+const sumBoxCoord = (coords: number[][]) =>
+  coords.reduce((acc, [r, c]) => acc + 100 * r + c, 0);
 // const moveRobot = (sR: number, sC: number, moves: string) => {
 //   printGrid(grid);
 //   // const [x, y] = robot.split(",").map(Number);
