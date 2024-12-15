@@ -26,8 +26,8 @@ export default (input: string) => {
     [r2, c2] = moveRobot(grid2, r2, c2, move);
   }
 
-  const p1 = sumBoxCoord(getBoxCoord(grid));
-  const p2 = sumBoxCoord(getBoxCoord(grid2));
+  const p1 = sumCoords(getBoxCoord(grid));
+  const p2 = sumCoords(getBoxCoord(grid2));
 
   return {
     part1: p1,
@@ -165,24 +165,48 @@ const findTouchingBoxes = (grid: Grid, r: number, c: number, dr: number): number
 };
 
 export const moveBigBox = (
-  grid: Grid,
+  grid: string[][],
   r: number,
   c: number,
   freeI: number,
   move: string
 ) => {
-  if (move === "^" || move === "v") {
-    const dr = move === "^" ? -1 : 1;
-    const boxes = findTouchingBoxes(grid, r + dr, c, dr);
+  switch (move) {
+    case "^": {
+      // find all touching boxes indices
+      const touchingBoxes = findTouchingBoxes(grid, r - 1, c, -1).sort(
+        (a, b) => a[0] - b[0]
+      );
+      for (const [i, j] of touchingBoxes)
+        grid[i][j] = visited.has(`${i + 1},${j}`) ? grid[i + 1][j] : ".";
+      grid[r - 1][c] = "@";
+      break;
+    }
 
-    for (const [i, j] of boxes)
-      grid[i][j] = visited.has(`${i - dr},${j}`) ? grid[i - dr][j] : "."; // move boxes
+    case "v": {
+      const touchingBoxes = findTouchingBoxes(grid, r + 1, c, 1).sort(
+        (a, b) => b[0] - a[0]
+      );
+      for (const [i, j] of touchingBoxes)
+        grid[i][j] = visited.has(`${i - 1},${j}`) ? grid[i - 1][j] : ".";
+      grid[r + 1][c] = "@";
+      break;
+    }
 
-    grid[r + dr][c] = "@"; // move robot
-  } else
-    for (let i = freeI; i + (move === ">" ? 1 : -1) !== c; i += move === ">" ? -1 : 1)
-      grid[r][i] = grid[r][i + (move === ">" ? -1 : 1)];
+    case ">": {
+      for (let i = freeI; i >= c; i--) {
+        grid[r][i] = grid[r][i - 1];
+      }
+      break;
+    }
 
+    case "<": {
+      for (let i = freeI; i <= c; i++) {
+        grid[r][i] = grid[r][i + 1];
+      }
+      break;
+    }
+  }
   grid[r][c] = ".";
 };
 
@@ -191,5 +215,5 @@ const getBoxCoord = (grid: string[][]) =>
     .flatMap((row, r) => row.map((ch, c) => (ch === "O" || ch === "[" ? [r, c] : null)))
     .filter(Boolean) as number[][];
 
-const sumBoxCoord = (coords: number[][]) =>
-  coords.reduce((acc, [r, c]) => acc + 100 * r + c, 0);
+const sumCoords = (coords: number[][]) =>
+  coords.reduce((a, [r, c]) => a + 100 * r + c, 0);

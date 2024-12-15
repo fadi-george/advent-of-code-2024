@@ -5,15 +5,7 @@ import solution, { findRobot, moveBigBox, moveRobot } from "./index";
 const path = "aoc/2024/day15/";
 
 describe("day 15", () => {
-  test("example", () => {
-    const input = readFile(`${path}sample.txt`);
-    const result = solution(input);
-    console.clear();
-    // expect(result.part1).toBe(10092);
-    // expect(result.part2).toBe(7572);
-  });
-
-  test.only("move big box 1", () => {
+  test("move big box 1", () => {
     const grid = [
       "##############",
       "##......##..##",
@@ -41,7 +33,7 @@ describe("day 15", () => {
     expect(grid).toEqual(expected);
   });
 
-  test.only("move down - 1", () => {
+  test("move down - 1", () => {
     const grid = [
       "##############",
       "##....@.....##",
@@ -69,7 +61,7 @@ describe("day 15", () => {
     expect(grid).toEqual(expected);
   });
 
-  test.only("move down - 2", () => {
+  test("move down - 2", () => {
     const grid = [
       "####################",
       "##[]..[]......[][]##",
@@ -101,43 +93,6 @@ describe("day 15", () => {
       "####################",
     ].map((l) => l.split(""));
     expect(grid).toEqual(expected);
-  });
-
-  test("move big box", () => {
-    const grid = [
-      "####################",
-      "##....[]....[]..[]##",
-      "##............[]..##",
-      "##..[][]....[]..[]##",
-      "##...[].......[]..##",
-      "##[]##....[]......##",
-      "##[]......[]..[]..##",
-      "##..[][]..@[].[][]##",
-      "##........[]......##",
-      "####################",
-    ].map((l) => l.split(""));
-    // console.table(grid);
-    const [r, c] = findRobot(grid);
-    // console.log(r, c);
-    moveBigBox(grid, r, c, 4, "^");
-    // printGrid(grid);
-    // expect(result.part1).toBe(10092);
-    // expect(result.part2).toBe(7572);
-
-    const expected = [
-      "####################",
-      "##....[]....[]..[]##",
-      "##............[]..##",
-      "##..[][]....[]..[]##",
-      "##...[]...[]..[]..##",
-      "##[]##....[]......##",
-      "##[]......@...[]..##",
-      "##..[][]...[].[][]##",
-      "##........[]......##",
-      "####################",
-    ].map((l) => l.split(""));
-    expect(true).toBe(true);
-    // expect(grid).toEqual(expected);
   });
 
   test("puzzle input", () => {
