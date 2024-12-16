@@ -17,9 +17,11 @@ export default (input: string) => {
   const grid = input.split("\n").map((line) => line.split(""));
 
   const [r, c] = findInGrid(grid, "S");
+  const score = getMinScore(grid, r, c);
+  const tiles = getTiles(grid, r, c, score);
   return {
-    part1: getMinScore(grid, r, c),
-    part2: getTiles(grid, r, c),
+    part1: score,
+    part2: tiles,
   };
 };
 
@@ -54,12 +56,12 @@ type Tile = Info & {
   path: Set<string>;
 };
 
-const getTiles = (grid: Grid, row: number, col: number) => {
-  let bestScore = Infinity;
-  let tiles = new Set<string>();
-  const visited = new Map<string, number>();
+const getTiles = (grid: Grid, row: number, col: number, bestScore: number) => {
   const pq = new MinPriorityQueue((v: Tile) => v.score);
   pq.enqueue({ r: row, c: col, dir: 1, score: 0, path: new Set([`${row},${col}`]) });
+
+  const visited = new Map<string, number>();
+  let tiles = new Set<string>();
 
   while (!pq.isEmpty()) {
     const { r, c, dir, score, path } = pq.dequeue();
@@ -70,7 +72,6 @@ const getTiles = (grid: Grid, row: number, col: number) => {
     if (ch === "E") {
       path.add(`${r},${c}`);
       tiles = tiles.union(path);
-      bestScore = score;
       continue;
     }
 
@@ -91,10 +92,5 @@ const getTiles = (grid: Grid, row: number, col: number) => {
     pq.enqueue({ r, c, dir: mod(dir + 1, 4), score: score + 1000, path: newPath });
   }
 
-  // for (const tile of tiles) {
-  //   const [r, c] = tile.split(",").map(Number);
-  //   grid[r][c] = "O";
-  // }
-  // console.table(grid);
   return tiles.size;
 };
