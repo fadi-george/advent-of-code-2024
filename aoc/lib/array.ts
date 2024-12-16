@@ -18,3 +18,8 @@ export const get2DIndex = (index: number, width: number) => [
 
 export const wrap = (value: number, min: number, max: number) =>
   (((value % (max - min)) + max) % max) - min;
+
+export const findInGrid = <T = string>(grid: T[][], value: T) => {
+  const r = grid.findIndex((line) => line.includes(value));
+  return [r, grid[r].indexOf(value)];
+};

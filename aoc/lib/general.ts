@@ -55,3 +55,7 @@ export const printGrid = (grid: string[][]) => {
   console.log(grid.map((row) => row.join("")).join("\n"));
   console.log("\n");
 };
+
+export const mod = (n: number, m: number) => {
+  return ((n % m) + m) % m;
+};
