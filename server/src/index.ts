@@ -3,7 +3,6 @@ import { starsRoute } from "./stars";
 import { logger } from "hono/logger";
 import { inputsRoute } from "./inputs";
 import { answerRoute } from "./answer";
-import "../../aoc/lib/array";
 
 const app = new Hono();
 

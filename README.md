@@ -5,6 +5,15 @@ Solutions written in Typescript.
 <img width="1912" alt="Screenshot 2024-12-12 at 11 04 50 PM" src="https://github.com/user-attachments/assets/0038354a-9b09-468e-b601-dc75177b2fe0" />
 <img width="1912" alt="Screenshot 2024-12-05 at 11 02 25 AM" src="https://github.com/user-attachments/assets/45ae8a28-b33e-4030-ba9e-facbd2f5eb2c">
 
+## Setup
+
+Install Bun: https://bun.sh/docs/installation
+
+Create an `.env` file in the root folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
+You can grab your session cookie by looking at your headers in the network log on adventofcode.com.
+
+Run `bun install` for each folder: `aoc`, `frontend`, and `server`.
+
 ## Running
 
 ### CLI
@@ -29,9 +38,6 @@ DAY=1
 ```
 
 ### Web App + Server
-
-If you have not done so, create an `.env` file in the root folder. Set the value of `AOC_SESSION_COOKIE` to `'session=<YOUR-VALUE-HERE>'`.
-You can grab your session cookie by looking at your headers in the network log on adventofcode.com.
 
 Run the hono backend server:
 

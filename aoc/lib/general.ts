@@ -1,5 +1,4 @@
 import fs from "fs";
-import "./array"; // array prototype methods
 import path from "path";
 
 export const readFile = (file: string) => {

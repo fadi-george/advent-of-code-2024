@@ -1,10 +1,3 @@
-declare global {
-  interface Array<T> {
-    sum(): number;
-    product(): number;
-  }
-}
-
 export const sum = (arr: number[]) => arr.reduce((acc, curr) => acc + curr, 0);
 
 export const product = (arr: number[]) => arr.reduce((acc, curr) => acc * curr, 1);
