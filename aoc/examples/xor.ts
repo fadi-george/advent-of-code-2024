@@ -3,13 +3,13 @@ let num2 = 4353453453;
 
 const numberXor = (a: number, b: number) => a ^ b;
 const bigIntXor = (a: bigint, b: bigint) => a ^ b;
-const fixedXor = (a: number, b: number) => {
+const fixedXor = (n1: number, n2: number) => {
   let r = 0;
   let i = 1;
 
-  while (num1 > 0 || num2 > 0) {
-    var a = num1 % 0x100000000;
-    var b = num2 % 0x100000000;
+  while (n1 > 0 || n2 > 0) {
+    var a = n1 % 0x100000000;
+    var b = n2 % 0x100000000;
 
     var c = a ^ b;
 
@@ -17,8 +17,8 @@ const fixedXor = (a: number, b: number) => {
 
     i *= 0x100000000;
 
-    num1 = Math.floor(num1 / 0x100000000);
-    num2 = Math.floor(num2 / 0x100000000);
+    n1 = Math.floor(n1 / 0x100000000);
+    n2 = Math.floor(n2 / 0x100000000);
   }
 
   return r;
