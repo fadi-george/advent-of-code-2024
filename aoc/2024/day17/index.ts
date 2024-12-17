@@ -1,3 +1,5 @@
+import { compareArrays } from "../../lib/array";
+import { xor } from "../../lib/general";
 // import { getGrid } from "../../lib/general";
 export const RegMap = {
   A: 0,
@@ -12,11 +14,9 @@ export default (input: string) => {
     .map((l) => l.match(/(\d+)/g)!.map(Number)[0]);
   const program = programLines.match(/\d+/g)!.map(Number);
 
-  const { out: p1 } = runProgram(registers, program);
-
   return {
-    part1: p1,
-    part2: "TODO",
+    part1: runProgram(registers, program).out.join(","),
+    part2: fixARegister(program),
   };
 };
 
@@ -35,7 +35,7 @@ export const runProgram = (registers: number[], program: number[]) => {
         registers[RegMap.A] = getAdv();
         break;
       case 1: // bxl
-        registers[RegMap.B] ^= comboOp;
+        registers[RegMap.B] = xor(registers[RegMap.B], comboOp);
         break;
       case 2: // bst
         registers[RegMap.B] = getComboVal(comboOp) % 8;
@@ -48,7 +48,7 @@ export const runProgram = (registers: number[], program: number[]) => {
         }
         break;
       case 4: // bxc
-        registers[RegMap.B] ^= registers[RegMap.C];
+        registers[RegMap.B] = xor(registers[RegMap.B], registers[RegMap.C]);
         break;
       case 5: // out
         out.push(getComboVal(comboOp) % 8);
@@ -80,8 +80,25 @@ export const runProgram = (registers: number[], program: number[]) => {
     }
   }
 
-  console.log({ out });
-  return { out: out.join(","), registers };
+  return { out, registers };
 };
 
-// 1,3,3,6,6,6,1,0,6
+export const fixARegister = (program: number[]) => {
+  let a = 1;
+
+  while (true) {
+    const { out } = runProgram([a, 0, 0], program);
+    if (out.length > program.length) {
+      return null;
+    }
+
+    if (compareArrays(out, program.slice(program.length - out.length))) {
+      if (out.length === program.length) break;
+      a *= 8;
+    } else {
+      a++;
+    }
+  }
+
+  return a;
+};

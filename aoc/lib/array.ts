@@ -16,3 +16,8 @@ export const findInGrid = <T = string>(grid: T[][], value: T) => {
   const r = grid.findIndex((line) => line.includes(value));
   return [r, grid[r].indexOf(value)];
 };
+
+export const compareArrays = (a: any[], b: any[]) => {
+  if (a.length !== b.length) return false;
+  return a.every((val, index) => val === b[index]);
+};
