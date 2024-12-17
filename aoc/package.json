@@ -3,6 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
+    "sample": "FILE=sample bun run index.ts",
+    "input": "FILE=input bun run index.ts",
     "test": "bun test"
   },
   "devDependencies": {

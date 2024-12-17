@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { createInterface } from "readline/promises";
 
 export const readFile = (filePath: string) => {
   if (!filePath) throw new Error("FILE is not set");
   return fs.readFileSync(filePath, "utf8");
 };
 
-export const downloadInput = async (year: string, day: string) => {
-  const inputPath = path.resolve(`./aoc/${year}/day${day}/input.txt`);
+export const downloadInput = async (dir: string, year: string, day: string) => {
+  const inputPath = path.resolve(`${dir}/${year}/day${day}/input.txt`);
   if (!fs.existsSync(inputPath)) {
     console.log(`Downloading input for ${year} day ${day}...`);
     const input = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
@@ -50,6 +51,24 @@ export const submit = async ({
   return dom.body.textContent?.includes("That's the right answer!");
 };
 
+export const getDay = async () => {
+  const day = process.env.DAY;
+
+  const formatDay = (day: string) => {
+    return clamp(parseInt(day), 1, 25).toString().padStart(2, "0");
+  };
+
+  if (day) return formatDay(day);
+
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  const input = await rl.question("Enter the day: ");
+  await rl.close();
+  return formatDay(input);
+};
+
 export const printGrid = (grid: string[][]) => {
   console.log(grid.map((row) => row.join("")).join("\n"));
   console.log("\n");
@@ -57,4 +76,8 @@ export const printGrid = (grid: string[][]) => {
 
 export const mod = (n: number, m: number) => {
   return ((n % m) + m) % m;
+};
+
+export const clamp = (n: number, min: number, max: number) => {
+  return Math.min(Math.max(n, min), max);
 };
