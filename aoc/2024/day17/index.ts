@@ -1,4 +1,4 @@
-import { compareArrays } from "../../lib/array";
+import { isEqualArr } from "../../lib/array";
 import { xor } from "../../lib/general";
 
 const [A, B, C] = [0, 1, 2];
@@ -10,17 +10,17 @@ export default (input: string) => {
 
   return {
     part1: runProgram(registers, program).out.join(","),
-    part2: fixARegister(program),
+    part2: fixRegister(program),
   };
 };
 
 export const runProgram = (reg: number[], program: number[]) => {
   let [ptr, out] = [0, [] as number[]];
 
+  // NOTE: Not using ^ or >> operator since it doesn't work well for large numbers
   const getVal = (op: number) => (op <= 3 ? op : reg[op - 4]);
   const getAdv = (c: number) => Math.floor(reg[0] / Math.pow(2, getVal(c)));
 
-  // NOTE: Not using ^ (xor) operator since it doesn't work well for large numbers
   const ops: ((c: number) => number | boolean)[] = [
     (c) => (reg[A] = getAdv(c)), // adv
     (c) => (reg[B] = xor(reg[B], c)), // bxl
@@ -36,14 +36,14 @@ export const runProgram = (reg: number[], program: number[]) => {
   return { out, registers: reg };
 };
 
-export const fixARegister = (program: number[]) => {
+export const fixRegister = (program: number[]) => {
   let a = 1;
   while (true) {
     const { out } = runProgram([a, 0, 0], program);
     if (out.length > program.length) return null;
 
     const target = program.slice(-out.length);
-    if (compareArrays(out, target)) {
+    if (isEqualArr(out, target)) {
       if (out.length === program.length) return a;
       a *= 8;
     } else a++;
