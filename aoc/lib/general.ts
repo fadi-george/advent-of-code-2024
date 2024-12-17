@@ -22,7 +22,7 @@ export const downloadInput = async (dir: string, year: string, day: string) => {
       );
     }
     const text = await input.text();
-    fs.writeFileSync(inputPath, text);
+    fs.writeFileSync(inputPath, text.trim());
   }
 };
 
