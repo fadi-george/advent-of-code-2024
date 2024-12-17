@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-export const readFile = (file: string) => {
-  if (!file) throw new Error("FILE is not set");
-  return fs.readFileSync(path.resolve(file), "utf8");
+export const readFile = (filePath: string) => {
+  if (!filePath) throw new Error("FILE is not set");
+  return fs.readFileSync(filePath, "utf8");
 };
 
 export const downloadInput = async (year: string, day: string) => {

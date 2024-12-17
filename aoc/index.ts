@@ -9,12 +9,13 @@ if (!year || !day) throw new Error("YEAR and DAY must be set");
 
 await downloadInput(year, day);
 
-const runner = (await import(`./${year}/day${day}/index.ts`)) as {
+const dir = import.meta.dir;
+const runner = (await import(`${dir}/${year}/day${day}/index.ts`)) as {
   default: (input: string) => { part1: string; part2: string };
 };
 
 const start = performance.now();
-const input = readFile(`./aoc/${year}/day${day}/${fileName}.txt`);
+const input = readFile(`${dir}/${year}/day${day}/${fileName}`);
 const result = runner.default(input);
 const end = performance.now();
 console.log(result);

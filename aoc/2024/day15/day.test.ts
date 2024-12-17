@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { printGrid, readFile } from "../../lib/general";
-import solution, { findRobot, moveBigBox, moveRobot } from "./index";
+import { readFile } from "../../lib/general";
+import solution, { findRobot, moveRobot } from "./index";
 
-const path = "aoc/2024/day15/";
+const dirname = import.meta.dirname;
 
 describe("day 15", () => {
   test("move big box 1", () => {
@@ -96,7 +96,7 @@ describe("day 15", () => {
   });
 
   test("puzzle input", () => {
-    const input = readFile(`${path}input.txt`);
+    const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
     expect(result.part1).toBe(1577255);
     expect(result.part2).toBe(1597035);
