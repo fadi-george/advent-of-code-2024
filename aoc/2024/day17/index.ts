@@ -1,17 +1,9 @@
 import { compareArrays } from "../../lib/array";
 import { xor } from "../../lib/general";
-// import { getGrid } from "../../lib/general";
-export const RegMap = {
-  A: 0,
-  B: 1,
-  C: 2,
-};
 
 export default (input: string) => {
   const [registerLines, programLines] = input.split(/\n\n/);
-  const registers: number[] = registerLines
-    .split(/\n/)
-    .map((l) => l.match(/(\d+)/g)!.map(Number)[0]);
+  const registers = registerLines.split(/\n/).map((l) => +l.match(/\d+/)![0]);
   const program = programLines.match(/\d+/g)!.map(Number);
 
   return {
@@ -27,37 +19,36 @@ export const runProgram = (registers: number[], program: number[]) => {
   const runLiteralOp = (op: number, comboOp: number) => {
     let noJump = true;
 
-    const getAdv = () =>
-      Math.floor(registers[RegMap.A] / Math.pow(2, getComboVal(comboOp)));
+    const getAdv = () => Math.floor(registers[0] / Math.pow(2, getComboVal(comboOp)));
 
     switch (op) {
       case 0: // adv
-        registers[RegMap.A] = getAdv();
+        registers[0] = getAdv();
         break;
       case 1: // bxl
-        registers[RegMap.B] = xor(registers[RegMap.B], comboOp);
+        registers[1] = xor(registers[1], comboOp);
         break;
       case 2: // bst
-        registers[RegMap.B] = getComboVal(comboOp) % 8;
+        registers[1] = getComboVal(comboOp) % 8;
         break;
       case 3: // jnz
-        const AVal = registers[RegMap.A];
+        const AVal = registers[0];
         if (AVal !== 0) {
           insPtr = comboOp;
           noJump = false;
         }
         break;
       case 4: // bxc
-        registers[RegMap.B] = xor(registers[RegMap.B], registers[RegMap.C]);
+        registers[1] = xor(registers[1], registers[2]);
         break;
       case 5: // out
         out.push(getComboVal(comboOp) % 8);
         break;
       case 6: // bdv
-        registers[RegMap.B] = getAdv();
+        registers[1] = getAdv();
         break;
       case 7: // cdv
-        registers[RegMap.C] = getAdv();
+        registers[2] = getAdv();
         break;
     }
 
@@ -66,18 +57,15 @@ export const runProgram = (registers: number[], program: number[]) => {
 
   const getComboVal = (op: number) => {
     if (op <= 3) return op;
-    if (op === 4) return registers[RegMap.A];
-    if (op === 5) return registers[RegMap.B];
-    if (op === 6) return registers[RegMap.C];
+    if (op === 4) return registers[0];
+    if (op === 5) return registers[1];
+    if (op === 6) return registers[2];
     throw new Error(`Invalid combo operand: ${op}`);
   };
 
   while (insPtr < program.length) {
-    // if (program[insPtr + 1] === undefined) break;
     const noJump = runLiteralOp(program[insPtr], program[insPtr + 1]);
-    if (noJump) {
-      insPtr += 2;
-    }
+    if (noJump) insPtr += 2;
   }
 
   return { out, registers };
@@ -85,19 +73,14 @@ export const runProgram = (registers: number[], program: number[]) => {
 
 export const fixARegister = (program: number[]) => {
   let a = 1;
-
   while (true) {
     const { out } = runProgram([a, 0, 0], program);
-    if (out.length > program.length) {
-      return null;
-    }
+    if (out.length > program.length) return null;
 
     if (compareArrays(out, program.slice(program.length - out.length))) {
       if (out.length === program.length) break;
       a *= 8;
-    } else {
-      a++;
-    }
+    } else a++;
   }
 
   return a;
