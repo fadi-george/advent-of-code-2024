@@ -9,10 +9,10 @@ export const RegMap = {
 
 export default (input: string) => {
   const [registerLines, programLines] = input.split(/\n\n/);
-  const registers: number[] = registerLines
+  const registers: bigint[] = registerLines
     .split(/\n/)
-    .map((l) => l.match(/(\d+)/g)!.map(Number)[0]);
-  const program = programLines.match(/\d+/g)!.map(Number);
+    .map((l) => l.match(/(\d+)/g)!.map(BigInt)[0]);
+  const program = programLines.match(/\d+/g)!.map(BigInt);
 
   return {
     part1: runProgram(registers, program).out.join(","),
@@ -20,43 +20,42 @@ export default (input: string) => {
   };
 };
 
-export const runProgram = (registers: number[], program: number[]) => {
+export const runProgram = (registers: bigint[], program: bigint[]) => {
   let insPtr = 0;
-  let out: number[] = [];
+  let out: bigint[] = [];
 
-  const runLiteralOp = (op: number, comboOp: number) => {
+  const runLiteralOp = (op: bigint, comboOp: bigint) => {
     let noJump = true;
 
-    const getAdv = () =>
-      Math.floor(registers[RegMap.A] / Math.pow(2, getComboVal(comboOp)));
+    const getAdv = (): bigint => registers[RegMap.A] / 2n ** BigInt(getComboVal(comboOp));
 
     switch (op) {
-      case 0: // adv
+      case 0n: // adv
         registers[RegMap.A] = getAdv();
         break;
-      case 1: // bxl
+      case 1n: // bxl
         registers[RegMap.B] ^= comboOp;
         break;
-      case 2: // bst
-        registers[RegMap.B] = getComboVal(comboOp) % 8;
+      case 2n: // bst
+        registers[RegMap.B] = getComboVal(comboOp) % 8n;
         break;
-      case 3: // jnz
+      case 3n: // jnz
         const AVal = registers[RegMap.A];
-        if (AVal !== 0) {
-          insPtr = comboOp;
+        if (AVal !== 0n) {
+          insPtr = Number(comboOp);
           noJump = false;
         }
         break;
-      case 4: // bxc
+      case 4n: // bxc
         registers[RegMap.B] ^= registers[RegMap.C];
         break;
-      case 5: // out
-        out.push(getComboVal(comboOp) % 8);
+      case 5n: // out
+        out.push(getComboVal(comboOp) % 8n);
         break;
-      case 6: // bdv
+      case 6n: // bdv
         registers[RegMap.B] = getAdv();
         break;
-      case 7: // cdv
+      case 7n: // cdv
         registers[RegMap.C] = getAdv();
         break;
     }
@@ -64,11 +63,11 @@ export const runProgram = (registers: number[], program: number[]) => {
     return noJump;
   };
 
-  const getComboVal = (op: number) => {
-    if (op <= 3) return op;
-    if (op === 4) return registers[RegMap.A];
-    if (op === 5) return registers[RegMap.B];
-    if (op === 6) return registers[RegMap.C];
+  const getComboVal = (op: bigint) => {
+    if (op <= 3n) return op;
+    if (op === 4n) return registers[RegMap.A];
+    if (op === 5n) return registers[RegMap.B];
+    if (op === 6n) return registers[RegMap.C];
     throw new Error(`Invalid combo operand: ${op}`);
   };
 
@@ -83,20 +82,20 @@ export const runProgram = (registers: number[], program: number[]) => {
   return { out, registers };
 };
 
-export const fixARegister = (program: number[]) => {
-  let a = 1;
+export const fixARegister = (program: bigint[]) => {
+  let a = 1n;
 
   while (true) {
-    const { out } = runProgram([a, 0, 0], program);
+    const { out } = runProgram([a, 0n, 0n], program);
     if (out.length > program.length) {
       return null;
     }
 
     if (compareArrays(out, program.slice(program.length - out.length))) {
       if (out.length === program.length) break;
-      a *= 8;
+      a *= 8n;
     } else {
-      a++;
+      a += 1n;
     }
   }
 
