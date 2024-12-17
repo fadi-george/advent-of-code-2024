@@ -5,6 +5,8 @@
   "scripts": {
     "sample": "FILE=sample bun run index.ts",
     "input": "FILE=input bun run index.ts",
+    "submit:p1": "FILE=input SUBMIT=1 bun run index.ts",
+    "submit:p2": "FILE=input SUBMIT=2 bun run index.ts",
     "test": "bun test"
   },
   "devDependencies": {

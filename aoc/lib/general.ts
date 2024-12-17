@@ -69,15 +69,14 @@ export const getDay = async () => {
   return formatDay(input);
 };
 
+export const getGrid = (input: string) => input.split("\n").map((row) => row.split(""));
+
 export const printGrid = (grid: string[][]) => {
   console.log(grid.map((row) => row.join("")).join("\n"));
   console.log("\n");
 };
 
-export const mod = (n: number, m: number) => {
-  return ((n % m) + m) % m;
-};
+export const mod = (n: number, m: number) => ((n % m) + m) % m;
 
-export const clamp = (n: number, min: number, max: number) => {
-  return Math.min(Math.max(n, min), max);
-};
+export const clamp = (n: number, min: number, max: number) =>
+  Math.min(Math.max(n, min), max);
