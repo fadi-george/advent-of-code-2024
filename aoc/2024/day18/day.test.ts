@@ -9,6 +9,7 @@ describe("day 18", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input, 7, 12);
     expect(result.part1).toBe(22);
+    expect(result.part2).toBe("6,1");
   });
 
   test("puzzle input", () => {

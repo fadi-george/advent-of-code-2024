@@ -1,7 +1,10 @@
 import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 import { DIRS } from "../../constants";
 
-export default (input: string, size = 71, bytes = 1024) => {
+const SIZE = process.env.FILE === "input" ? 71 : 7;
+const BYTES = process.env.FILE === "input" ? 1024 : 12;
+
+export default (input: string, size = SIZE, bytes = BYTES) => {
   const lines = input.split(/\n/);
   const coords = lines.map((line) => line.split(",").map(Number));
 
@@ -14,10 +17,12 @@ export default (input: string, size = 71, bytes = 1024) => {
     grid[y][x] = "#";
   }
   const p1 = solve(grid);
+  const p2 = findBlockingByte(size, coords);
+  console.log(p2);
 
   return {
     part1: p1,
-    part2: 0,
+    part2: p2.join(","),
   };
 };
 
@@ -70,3 +75,17 @@ const solve = (grid: string[][]) => {
 
 // const debug
 // 140 wrong
+const findBlockingByte = (size: number, coords: number[][]) => {
+  const grid = Array.from({ length: size }, () =>
+    Array.from({ length: size }, () => ".")
+  );
+
+  for (let i = 0; i < coords.length; i++) {
+    const [x, y] = coords[i];
+    grid[y][x] = "#";
+
+    let steps = solve(grid);
+    if (steps === Infinity) return [x, y];
+  }
+  return null;
+};
