@@ -63,29 +63,23 @@ const solve = (grid: string[][]) => {
     }
   }
 
-  // for (const key of minPath) {
-  //   const [r, c] = key.split(",").map(Number);
-  //   grid[r][c] = "O";
-  // }
-  // console.table(grid);
-
-  // console.table(grid);
   return minSteps;
 };
 
-// const debug
-// 140 wrong
 const findBlockingByte = (size: number, coords: number[][]) => {
   const grid = Array.from({ length: size }, () =>
     Array.from({ length: size }, () => ".")
   );
 
-  for (let i = 0; i < coords.length; i++) {
-    const [x, y] = coords[i];
+  coords.forEach(([x, y]) => {
     grid[y][x] = "#";
+  });
 
+  for (let i = coords.length - 1; i >= 0; i--) {
+    const [x, y] = coords[i];
+    grid[y][x] = ".";
     let steps = solve(grid);
-    if (steps === Infinity) return [x, y];
+    if (steps !== Infinity) return coords[i];
   }
   return null;
 };
