@@ -1,7 +1,7 @@
 import { isEqualArr } from "../../lib/array";
-import { xor } from "../../lib/general";
+import { shiftRight, xor } from "../../lib/general";
 
-const [A, B, C] = [0, 1, 2];
+export const [A, B, C] = [0, 1, 2];
 
 export default (input: string) => {
   const [registerLines, programLines] = input.split(/\n\n/);
@@ -19,7 +19,7 @@ export const runProgram = (reg: number[], program: number[]) => {
 
   // NOTE: Not using ^ or >> operator since it doesn't work well for large numbers
   const getVal = (op: number) => (op <= 3 ? op : reg[op - 4]);
-  const getAdv = (c: number) => Math.floor(reg[0] / Math.pow(2, getVal(c)));
+  const getAdv = (c: number) => shiftRight(reg[A], getVal(c));
 
   const ops: ((c: number) => number | boolean)[] = [
     (c) => (reg[A] = getAdv(c)), // adv

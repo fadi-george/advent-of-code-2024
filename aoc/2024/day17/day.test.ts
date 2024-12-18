@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFile } from "../../lib/general";
-import solution, { runProgram } from "./index";
+import solution, { B, runProgram } from "./index";
 
 const dirname = import.meta.dirname;
 
@@ -9,7 +9,7 @@ describe("day 17", () => {
     let out;
     let registers;
     ({ registers } = runProgram([0, 0, 9], [2, 6]));
-    expect(registers[1]).toEqual(1);
+    expect(registers[B]).toEqual(1);
 
     ({ out } = runProgram([10, 0, 0], [5, 0, 5, 1, 5, 4]));
     expect(out.join(",")).toEqual("0,1,2");
@@ -18,10 +18,10 @@ describe("day 17", () => {
     expect(out.join(",")).toEqual("4,2,5,6,7,7,7,7,3,1,0");
 
     ({ out, registers } = runProgram([0, 29, 0], [1, 7]));
-    expect(registers[1]).toEqual(26);
+    expect(registers[B]).toEqual(26);
 
     ({ out, registers } = runProgram([0, 2024, 43690], [4, 0]));
-    expect(registers[1]).toEqual(44354);
+    expect(registers[B]).toEqual(44354);
   });
 
   test("example input", () => {

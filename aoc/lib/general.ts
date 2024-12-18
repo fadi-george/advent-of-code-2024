@@ -87,19 +87,10 @@ export const largeXor = (a: bigint, b: bigint) => a ^ b;
  * This is a fixed xor function that works for large numbers. Since JavaScript
  * cast values to 32-bit integers, we need to use this to xor large numbers.
  */
-export const xor = (n1: number, n2: number) => {
-  let result = 0;
-  let multiplier = 1;
+export const xor = (n1: number, n2: number) => Number(BigInt(n1) ^ BigInt(n2));
 
-  while (n1 > 0 || n2 > 0) {
-    const chunk1 = n1 % 0x100000000;
-    const chunk2 = n2 % 0x100000000;
-    result += multiplier * (chunk1 ^ chunk2);
-
-    multiplier *= 0x100000000;
-    n1 = Math.floor(n1 / 0x100000000);
-    n2 = Math.floor(n2 / 0x100000000);
-  }
-
-  return result;
-};
+/**
+ * This is a fixed shift right function that works for large numbers. Since JavaScript
+ * cast values to 32-bit integers, we need to use this to shift right large numbers.
+ */
+export const shiftRight = (n: number, m: number) => Number(BigInt(n) >> BigInt(m));
