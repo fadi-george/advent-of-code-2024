@@ -13,8 +13,9 @@ describe("day 18", () => {
   });
 
   test("puzzle input", () => {
-    // const input = readFile(`${dirname}/input.txt`);
-    // const result = solution(input);
-    // expect(result.part1).toBe(0);
+    const input = readFile(`${dirname}/input.txt`);
+    const result = solution(input, 71, 1024);
+    expect(result.part1).toBe(304);
+    expect(result.part2).toBe("50,28");
   });
 });

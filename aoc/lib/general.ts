@@ -71,6 +71,11 @@ export const getDay = async () => {
 
 export const getGrid = (input: string) => input.split("\n").map((row) => row.split(""));
 
+export const makeGrid = (w: number, h: number, ch: string) =>
+  Array(h)
+    .fill(0)
+    .map(() => Array(w).fill(ch));
+
 export const printGrid = (grid: string[][]) => {
   console.log(grid.map((row) => row.join("")).join("\n"));
   console.log("\n");
