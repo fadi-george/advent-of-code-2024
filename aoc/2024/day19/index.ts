@@ -13,6 +13,7 @@ export default function solution(input: string) {
 
 const checkDesigns = (patterns: string[], designs: string[]) => {
   const cache = new Map<string, number>();
+  patterns.sort((a, b) => b.length - a.length);
 
   const getWays = (str: string): number => {
     if (str.length === 0) return 1;
