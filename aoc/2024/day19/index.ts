@@ -1,4 +1,5 @@
 import { MinPriorityQueue } from "@datastructures-js/priority-queue";
+import { sum } from "../../lib/array";
 
 export default function solution(input: string) {
   const [towelPatterns, onsenLine] = input.split(/\n\n/);
@@ -6,7 +7,8 @@ export default function solution(input: string) {
   const onsenPatterns = onsenLine.split(/\n/);
 
   const p1 = validatePatterns(patterns, onsenPatterns);
-  return { part1: p1, part2: "" };
+  const p2 = getPatternCount(patterns, onsenPatterns);
+  return { part1: p1, part2: p2 };
 }
 
 type Info = {
@@ -40,4 +42,29 @@ const validatePatterns = (patternSet: Set<string>, onsenPatterns: string[]) => {
     }
   }
   return validPatterns.length;
+};
+
+const getPatternCount = (patternSet: Set<string>, onsenPatterns: string[]) => {
+  const patterns = [...patternSet];
+  const ways: number[] = [];
+  const cache = new Map<string, number>();
+
+  const getWays = (str: string) => {
+    if (str.length === 0) return 1;
+    if (cache.has(str)) return cache.get(str)!;
+    let count = 0;
+    for (const pattern of patterns) {
+      if (str.startsWith(pattern)) {
+        count += getWays(str.replace(pattern, ""));
+      }
+    }
+    cache.set(str, count);
+    return count;
+  };
+
+  for (const pattern of onsenPatterns) {
+    ways.push(getWays(pattern));
+  }
+
+  return sum(ways);
 };
