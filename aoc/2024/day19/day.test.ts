@@ -8,14 +8,16 @@ describe("day 19", () => {
   test("example input", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
-    expect(result.part1).toBe("");
-    expect(result.part2).toBe("");
+    expect(result.part1).toBe(6);
+    // expect(result.part2).toBe("");
   });
 
-  test("puzzle input", () => {
-    const input = readFile(`${dirname}/input.txt`);
-    const result = solution(input);
-    expect(result.part1).toBe("");
-    expect(result.part2).toBe("");
-  });
+  // test("puzzle input", () => {
+  //   const input = readFile(`${dirname}/input.txt`);
+  //   const result = solution(input);
+  //   expect(result.part1).toBe("");
+  //   // expect(result.part2).toBe("");
+  // });
 });
+
+// 301 - wrong
