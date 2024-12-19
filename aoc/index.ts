@@ -6,9 +6,7 @@ const submitPart = process.env.SUBMIT as "1" | "2" | undefined;
 const day = await getDay();
 
 const dir = import.meta.dir;
-if (fileName === "input") {
-  await downloadInput(dir, year, day);
-}
+await downloadInput(dir, year, day);
 
 const runner = (await import(`${dir}/${year}/day${day}/index.ts`)) as {
   default: (input: string) => { part1: string; part2: string };
