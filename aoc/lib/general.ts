@@ -99,3 +99,19 @@ export const xor = (n1: number, n2: number) => Number(BigInt(n1) ^ BigInt(n2));
  * cast values to 32-bit integers, we need to use this to shift right large numbers.
  */
 export const shiftRight = (n: number, m: number) => Number(BigInt(n) >> BigInt(m));
+
+export const memoize = (func: (...args: any[]) => any) => {
+  const cache = new Map();
+
+  return function (...args: any[]) {
+    const key = JSON.stringify(args); // Convert args to a string key
+
+    if (cache.has(key)) {
+      return cache.get(key); // Return cached result
+    }
+
+    const result = func(...args); // Compute result if not cached
+    cache.set(key, result);
+    return result;
+  };
+};

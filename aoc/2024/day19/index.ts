@@ -1,4 +1,5 @@
 import { sum } from "../../lib/array";
+import { memoize } from "../../lib/general";
 
 export default function solution(input: string) {
   const [towelPatterns, onsenLine] = input.split(/\n\n/);
@@ -9,20 +10,15 @@ export default function solution(input: string) {
 }
 
 const checkDesigns = (patterns: string[], designs: string[]) => {
-  const cache = new Map<string, number>();
   patterns.sort((a, b) => b.length - a.length);
 
-  const getWays = (str: string): number => {
+  const getWays = memoize((str: string): number => {
     if (!str.length) return 1;
-    if (cache.has(str)) return cache.get(str)!;
-
     let count = 0;
     for (const pattern of patterns)
       if (str.startsWith(pattern)) count += getWays(str.substring(pattern.length));
-
-    cache.set(str, count);
     return count;
-  };
+  });
 
   const ways = designs.map(getWays);
   return {
