@@ -1,15 +1,13 @@
 import { DIRS } from "../../constants";
 import { findInGrid, manhattanDistance } from "../../lib/array";
 import { getGrid } from "../../lib/general";
-
-type Grid = string[][];
-type Cheats = Record<number, number>;
+import { Grid, Point } from "../../types";
 
 export default function solution(input: string) {
   const grid = getGrid(input);
+
   const start = findInGrid(grid, "S");
   const end = findInGrid(grid, "E");
-
   const bestPath = getBestPath(grid, start, end);
 
   return {
@@ -18,11 +16,9 @@ export default function solution(input: string) {
   };
 }
 
-export const getBestPath = (
-  grid: Grid,
-  start: [number, number],
-  end: [number, number]
-) => {
+const ValidChars = [".", "E"];
+
+export const getBestPath = (grid: Grid, start: Point, end: Point) => {
   const visited = new Set<string>();
   const q = [{ r: start[0], c: start[1], path: [start] }];
 
@@ -30,23 +26,19 @@ export const getBestPath = (
     const { r, c, path } = q.shift()!;
     if (r === end[0] && c === end[1]) return path;
 
-    const key = `${r},${c}`;
-    if (visited.has(key)) continue;
-    visited.add(key);
+    if (visited.has(`${r},${c}`)) continue;
+    visited.add(`${r},${c}`);
 
-    for (const [dr, dc] of DIRS) {
-      const nr = r + dr;
-      const nc = c + dc;
-      const char = grid[nr]?.[nc];
-      if (char === "." || char === "E") {
-        q.push({ r: nr, c: nc, path: [...path, [nr, nc]] });
-      }
-    }
+    for (const [dr, dc] of DIRS)
+      if (ValidChars.includes(grid[r + dr]?.[c + dc]))
+        q.push({ r: r + dr, c: c + dc, path: [...path, [r + dr, c + dc]] });
   }
   return [];
 };
 
-export const findCheats = (bestPath: [number, number][], cheatLimit: number) => {
+type Cheats = Record<number, number>;
+
+export const findCheats = (bestPath: Point[], cheatLimit: number) => {
   const cheats: Cheats = {};
 
   for (let i = 0; i < bestPath.length; i++) {
