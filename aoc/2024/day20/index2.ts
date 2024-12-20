@@ -3,18 +3,21 @@ import { findInGrid, manhattanDistance } from "../../lib/array";
 import { getGrid } from "../../lib/general";
 import { Grid, Point } from "../../types";
 
+// Alternative solution that creates a Cheats object and then calculates the score
 export default function solution(input: string) {
   const grid = getGrid(input);
-  const [start, end] = [findInGrid(grid, "S"), findInGrid(grid, "E")];
+
+  const start = findInGrid(grid, "S");
+  const end = findInGrid(grid, "E");
   const bestPath = getBestPath(grid, start, end);
 
   return {
-    part1: getCheatScore(bestPath, 2),
-    part2: getCheatScore(bestPath, 20),
+    part1: getCheatScore(findCheats(bestPath, 2)),
+    part2: getCheatScore(findCheats(bestPath, 20)),
   };
 }
 
-const [ValidChars, SAVE_THRESHOLD] = [[".", "E"], 100];
+const ValidChars = [".", "E"];
 
 export const getBestPath = (grid: Grid, start: Point, end: Point) => {
   const visited = new Set<string>();
@@ -34,17 +37,25 @@ export const getBestPath = (grid: Grid, start: Point, end: Point) => {
   return [];
 };
 
-export const getCheatScore = (bestPath: Point[], cheatLimit: number) => {
-  let result = 0;
+type Cheats = Record<number, number>;
 
-  // All values in path are free space so cutting through walls will land you back on a free space
-  // if we use manhatten distance. Then it is a mater of checking if we're within the cheat limit.
-  for (let i = 0; i < bestPath.length; i++)
+export const findCheats = (bestPath: Point[], cheatLimit: number) => {
+  const cheats: Cheats = {};
+
+  for (let i = 0; i < bestPath.length; i++) {
     for (let j = i + 1; j < bestPath.length; j++) {
       const distance = manhattanDistance(bestPath[i], bestPath[j]);
       const stepDiff = j - i;
-      if (distance <= cheatLimit && stepDiff - distance >= SAVE_THRESHOLD) result += 1;
-    }
 
-  return result;
+      if (distance <= cheatLimit) {
+        const saved = stepDiff - distance;
+        if (saved === 0) continue;
+        cheats[saved] = (cheats[saved] || 0) + 1;
+      }
+    }
+  }
+  return cheats;
 };
+
+export const getCheatScore = (cheats: Cheats, threshold = 100) =>
+  Object.entries(cheats).reduce((acc, [k, v]) => (+k >= threshold ? acc + v : acc), 0);
