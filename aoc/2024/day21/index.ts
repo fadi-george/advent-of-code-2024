@@ -1,22 +1,19 @@
 import { MinPriorityQueue } from "@datastructures-js/priority-queue";
+import { memoize } from "../../lib/general";
+import { sum } from "../../lib/array";
 
 export default function solution(input: string) {
   const keys = input.split(/\n/);
-  const p1 = solve(keys);
-  return { part1: p1, part2: "" };
+  return { part1: solve(keys, 3), part2: solve(keys, 26) };
 }
 
-const solve = (keys: string[]) => {
+const solve = (keys: string[], robots: number) => {
   let res = 0;
   keys.forEach((key) => {
     const num = parseInt(key.match(/\d+/)?.[0] ?? "0");
-    const lvl1 = getNumDirs(key);
-    const lvl2 = getSmallestStr(lvl1.flatMap(getKeyDirs(true)));
-    const lvl3 = getSmallestStr(lvl2.flatMap(getKeyDirs(false)));
-
-    res += num * lvl3[0].length;
+    const minLength = checkChunk(key, robots);
+    res += num * minLength;
   });
-
   return res;
 };
 
@@ -87,7 +84,7 @@ const getNumDirs = (sequence: string) => {
   return res;
 };
 
-const getKeyDirs = (returnAll: boolean) => (sequence: string) => {
+const getKeyDirs = (sequence: string) => {
   const q = new MinPriorityQueue(
     (v: { r: number; c: number; str: string; i: number }) => v.str.length
   );
@@ -98,7 +95,6 @@ const getKeyDirs = (returnAll: boolean) => (sequence: string) => {
     const { r, c, str, i } = q.dequeue()!;
 
     if (i >= sequence.length) {
-      if (!returnAll) return str;
       res.push(str);
       continue;
     }
@@ -123,56 +119,32 @@ const getKeyDirs = (returnAll: boolean) => (sequence: string) => {
     else if (cDiff > 0) q.enqueue({ r: r, c: c + 1, str: str + ">", i });
   }
 
-  return getSmallestStr(res);
+  return res;
 };
 
-const getSmallestStr = (strs: string[]) => {
+const checkChunk = memoize((chunk: string, depth: number): number => {
+  if (depth === 0) return chunk.length;
+  const ways = /^\d/.test(chunk) ? getNumDirs(chunk) : getKeyDirs(chunk);
+
   let minLength = Infinity;
-  for (const str of strs) {
-    if (str.length < minLength) {
-      minLength = str.length;
+  for (const way of ways) {
+    const chunks = way.match(/[^A]*A/g)! as string[];
+    const tmpMin = sum(chunks.map((c) => checkChunk(c, depth - 1)));
+    if (tmpMin < minLength) {
+      minLength = tmpMin;
     }
   }
-  return strs.filter((s) => s.length === minLength);
-};
-
-// console.time("lvl1");
-// const lvl1 = getNumDirs("029A");
-// console.timeEnd("lvl1");
-// console.log({ lvl1, lvl1Length: lvl1.length });
-
-// console.time("lvl2");
-// const lvl2 = getKeyDirs("<A^A>^^AvvvA");
-// console.timeEnd("lvl2");
-// console.log({ lvl2, lvl2Length: lvl2.length });
-
-// console.time("lvl3");
-// const lvl3 = getKeyDirs("v<<A>>^A<A>AvA<^AA>A<vAAA>^A", false);
-// console.timeEnd("lvl3");
-// console.log({ lvl3, lvl3Length: lvl3.length });
-// const m1 = getNumDirs("379A");
-// const m2 = getSmallestStr(m1.flatMap((s) => getKeyDirs(s, true)));
-// const m3 = getSmallestStr(m2.flatMap((s) => getKeyDirs(s, false)));
-// console.log({ m2, m3 });
-
-// // const m1min = Math.min(...m1.map((s) => s.length));
-// // const m1max = Math.max(...m1.map((s) => s.length));
-// // console.log({ m1min, m1max });
-
-// // const m2min = Math.min(...m2.map((s) => s.length));
-// // const m2max = Math.max(...m2.map((s) => s.length));
-// // console.log({ m2min, m2max });
-
-// const m3min = Math.min(...m3.map((s) => s.length));
-// const m3max = Math.max(...m3.map((s) => s.length));
-// console.log({ m3min, m3max });
+  return minLength;
+});
 
 // const m1 = getNumDirs("379A");
-// const m2 = getSmallestStr(m1.flatMap(getKeyDirs(true)));
-// const m3 = getSmallestStr(m2.slice(0, 30).flatMap(getKeyDirs(false)));
-// console.table(m1);
-// console.log(m1[0].length);
-// console.table(m2);
-// console.log(m2[0].length);
-// console.table(m3);
-// console.log(m3[0].length);
+// for (const s of m1) {
+//   console.log(s);
+//   const m2 = getKeyDirs(s);
+//   console.table(m2);
+//   console.log(m2[0].length);
+// }
+
+// console.log("hmm", checkChunk("^A^<^<A>>AvvvA", 1));
+// console.log("hmm", checkChunk("^A<<^^A>>AvvvA", 1));
+// console.log("hmm", checkChunk("379A", 3));

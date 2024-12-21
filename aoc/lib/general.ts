@@ -100,17 +100,17 @@ export const xor = (n1: number, n2: number) => Number(BigInt(n1) ^ BigInt(n2));
  */
 export const shiftRight = (n: number, m: number) => Number(BigInt(n) >> BigInt(m));
 
-export const memoize = (func: (...args: any[]) => any) => {
-  const cache = new Map();
+export const memoize = <Args extends any[], Result>(func: (...args: Args) => Result) => {
+  const cache = new Map<string, Result>();
 
-  return function (...args: any[]) {
-    const key = JSON.stringify(args); // Convert args to a string key
+  return function (...args: Args): Result {
+    const key = JSON.stringify(args);
 
     if (cache.has(key)) {
-      return cache.get(key); // Return cached result
+      return cache.get(key)!;
     }
 
-    const result = func(...args); // Compute result if not cached
+    const result = func(...args);
     cache.set(key, result);
     return result;
   };
