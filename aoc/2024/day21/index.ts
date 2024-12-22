@@ -59,8 +59,8 @@ const checkChunk = memoize((chunk: string, depth: number): number => {
 
   let minLength = Infinity;
   for (const way of ways) {
-    // split into chunks that end with 'A' e.g. '^^A>vA<A' -> ['^^A', '>vA', '<A'], some sub-chunks might might be the same for all different ways
-    // other sub-chunks might be lead to shorter strings
+    // split into chunks that end with 'A' e.g. '^^A>vA<A' -> ['^^A', '>vA', '<A'], some sub-chunks might be shared
+    // other sub-chunks might  lead to shorter length strings
     const chunks = way.match(/[^A]*A/g)!;
     minLength = Math.min(minLength, sum(chunks.map((c) => checkChunk(c, depth - 1))));
   }
