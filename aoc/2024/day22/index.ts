@@ -12,9 +12,9 @@ const prune = (secret: number) => modn(secret, 16777216);
 
 const runSequence = (secret: number): number => {
   secret = prune(mix(secret, shiftLeft(secret, 6)));
-  secret = prune(mix(secret, shiftRight(secret, 5)));
-  secret = prune(mix(secret, shiftLeft(secret, 11)));
-  return secret;
+  secret = mix(secret, shiftRight(secret, 5));
+  secret = mix(secret, shiftLeft(secret, 11));
+  return prune(secret);
 };
 
 const getNSthSecret = (secret: number) => {
