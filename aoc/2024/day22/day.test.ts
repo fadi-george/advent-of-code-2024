@@ -9,13 +9,17 @@ describe("day 22", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
     expect(result.part1).toBe(37327623);
-    expect(result.part2).toBe("");
+  });
+
+  test("example input 2", () => {
+    const input = readFile(`${dirname}/sample2.txt`);
+    const result = solution(input);
+    expect(result.part2).toBe(23);
   });
 
   test("puzzle input", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
     expect(result.part1).toBe(13185239446);
-    expect(result.part2).toBe("");
   });
 });
