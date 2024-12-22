@@ -106,7 +106,7 @@ export const modn = (n: number, m: number) => Number(BigInt(n) % BigInt(m));
  */
 export const shiftRight = (n: number, m: number) => Number(BigInt(n) >> BigInt(m));
 
-export const shiftLeft = (n: number, m: number) => Number(BigInt(n) << BigInt(m));
+export const shiftLeft = (n: number, m: number) => n * Math.pow(2, m);
 
 export const memoize = <Args extends any[], Result>(func: (...args: Args) => Result) => {
   const cache = new Map<string, Result>();
