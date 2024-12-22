@@ -1,63 +1,34 @@
-import { isEqualArr, sum } from "../../lib/array";
-import { memoize, modn, shiftLeft, shiftRight, xor } from "../../lib/general";
+import { sum } from "../../lib/array";
+import { modn, shiftLeft, shiftRight, xor } from "../../lib/general";
 
 export default function solution(input: string) {
   const secrets = input.split("\n").map(Number);
-  const p1 = solve(secrets);
-  const p2 = solve2(secrets);
-
-  return { part1: p1, part2: p2 };
+  return { part1: sumSecrets(secrets), part2: getMostBananas(secrets) };
 }
 
+// using bigints for large numbers due to JS casting to 32-bit integers for bitwise operations
 const mix = (secret: number, num: number) => xor(secret, num);
 const prune = (secret: number) => modn(secret, 16777216);
 
-const ops = [
-  (secret: number) => shiftLeft(secret, 6),
-  (secret: number) => shiftRight(secret, 5),
-  (secret: number) => shiftLeft(secret, 11),
-];
-
-const runSequence = memoize((num: number) => {
-  let secret = num;
-  for (let j = 0; j < ops.length; j++) {
-    const op = ops[j];
-    const value = op(secret);
-    secret = mix(secret, value);
-    secret = prune(secret);
-  }
+const runSequence = (secret: number): number => {
+  secret = prune(mix(secret, shiftLeft(secret, 6)));
+  secret = prune(mix(secret, shiftRight(secret, 5)));
+  secret = prune(mix(secret, shiftLeft(secret, 11)));
   return secret;
-});
-
-const getNSthSecret = memoize((secret: number) => {
-  for (let i = 0; i < 2000; i++) {
-    secret = runSequence(secret);
-  }
-  return secret;
-});
-
-const solve = (secrets: number[]) => {
-  const result = [];
-  for (const secret of secrets) {
-    result.push(getNSthSecret(secret));
-  }
-  return sum(result);
 };
 
-const solve2 = (secrets: number[]) => {
-  // const SEQUENCES = [];
-  // for (let n1 = -9; n1 <= 9; n1++) {
-  //   for (let n2 = -9; n2 <= 9; n2++) {
-  //     for (let n3 = -9; n3 <= 9; n3++) {
-  //       for (let n4 = -9; n4 <= 9; n4++) {
-  //         SEQUENCES.push([n1, n2, n3, n4]);
-  //       }
-  //     }
-  //   }
-  // }
+const getNSthSecret = (secret: number) => {
+  for (let i = 0; i < 2000; i++) secret = runSequence(secret);
+  return secret;
+};
+const sumSecrets = (secrets: number[]) => sum(secrets.map(getNSthSecret));
 
+const getMostBananas = (secrets: number[]) => {
   let maxBananas = -1;
-  const diffMap = new Map<string, number[]>();
+
+  // keep track of the same 4 change sequence that may occur for each secret
+  // value will just be the sum as we go along
+  const diffMap = new Map<string, number>();
 
   for (let i = 0; i < secrets.length; i++) {
     let secret = secrets[i];
@@ -73,30 +44,23 @@ const solve2 = (secrets: number[]) => {
       changes.push(digits[j] - digits[j - 1]);
     }
 
-    let innerMap = new Map<string, number>();
+    // keep track of each 4 change sequence for current secret
+    const set = new Set<string>();
     for (let j = 0; j < changes.length; j++) {
       const seq = changes.slice(j, j + 4);
       if (seq.length !== 4) continue;
-      if (innerMap.has(seq.toString())) continue;
 
-      // keep track of the max for each sequence
-      innerMap.set(seq.toString(), digits[j + 4]);
-    }
+      // only need first value of each unique 4 change sequence
+      const key = seq.toString();
+      if (set.has(key)) continue;
+      set.add(key);
 
-    for (const [key, val] of innerMap.entries()) {
-      const diffVal = diffMap.get(key) ?? [];
-      diffMap.set(key, [...diffVal, val]);
+      const val = diffMap.get(key) ?? 0;
+      diffMap.set(key, val + digits[j + 4]);
     }
   }
 
-  for (const [key, val] of diffMap.entries()) {
-    const bananas = sum(val);
-    maxBananas = Math.max(maxBananas, bananas);
-  }
+  for (const val of diffMap.values()) maxBananas = Math.max(maxBananas, val);
 
   return maxBananas;
 };
-
-// 1102 too low
-// 1115 too low
-solve2([1]);

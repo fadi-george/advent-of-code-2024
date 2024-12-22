@@ -21,5 +21,6 @@ describe("day 22", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
     expect(result.part1).toBe(13185239446);
+    expect(result.part2).toBe(1501);
   });
 });
