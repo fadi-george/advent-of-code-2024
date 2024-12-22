@@ -8,14 +8,14 @@ describe("day 22", () => {
   test("example input", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
-    expect(result.part1).toBe("");
+    expect(result.part1).toBe(37327623);
     expect(result.part2).toBe("");
   });
 
   test("puzzle input", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
-    expect(result.part1).toBe("");
+    expect(result.part1).toBe(13185239446);
     expect(result.part2).toBe("");
   });
 });

@@ -94,11 +94,15 @@ export const largeXor = (a: bigint, b: bigint) => a ^ b;
  */
 export const xor = (n1: number, n2: number) => Number(BigInt(n1) ^ BigInt(n2));
 
+export const modn = (n: number, m: number) => Number(BigInt(n) % BigInt(m));
+
 /**
  * This is a fixed shift right function that works for large numbers. Since JavaScript
  * cast values to 32-bit integers, we need to use this to shift right large numbers.
  */
 export const shiftRight = (n: number, m: number) => Number(BigInt(n) >> BigInt(m));
+
+export const shiftLeft = (n: number, m: number) => Number(BigInt(n) << BigInt(m));
 
 export const memoize = <Args extends any[], Result>(func: (...args: Args) => Result) => {
   const cache = new Map<string, Result>();
