@@ -28,7 +28,7 @@ const getMostBananas = (secrets: number[]) => {
 
   // keep track of the same 4 change sequence that may occur for each secret
   // value will just be the sum as we go along
-  const diffMap = new Map<string, number>();
+  const diffMap = new Map<number, number>();
 
   for (let i = 0; i < secrets.length; i++) {
     let secret = secrets[i];
@@ -45,13 +45,13 @@ const getMostBananas = (secrets: number[]) => {
     }
 
     // keep track of each 4 change sequence for current secret
-    const set = new Set<string>();
+    const set = new Set<number>();
     for (let j = 0; j < changes.length; j++) {
       const seq = changes.slice(j, j + 4);
       if (seq.length !== 4) continue;
 
       // only need first value of each unique 4 change sequence
-      const key = seq.toString();
+      const key = getHash(seq);
       if (set.has(key)) continue;
       set.add(key);
 
@@ -64,3 +64,7 @@ const getMostBananas = (secrets: number[]) => {
 
   return maxBananas;
 };
+
+// using base 18 to avoid collisions, faster than string key
+const getHash = (changes: number[]) =>
+  changes[0] * 18 ** 3 + changes[1] * 18 ** 2 + changes[2] * 18 + changes[3];
