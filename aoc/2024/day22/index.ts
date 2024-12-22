@@ -6,7 +6,7 @@ export default function solution(input: string) {
   return { part1: sumSecrets(secrets), part2: getMostBananas(secrets) };
 }
 
-// using bigints for large numbers due to JS casting to 32-bit integers for bitwise operations
+// using custom bitwise helpers since JS casting to signed 32-bit integers is not safe for large numbers
 const mix = (secret: number, num: number) => xor(secret, num);
 const prune = (secret: number) => modn(secret, 16777216);
 

@@ -92,7 +92,11 @@ export const largeXor = (a: bigint, b: bigint) => a ^ b;
  * This is a fixed xor function that works for large numbers. Since JavaScript
  * cast values to 32-bit integers, we need to use this to xor large numbers.
  */
-export const xor = (n1: number, n2: number) => Number(BigInt(n1) ^ BigInt(n2));
+export const xor = (n1: number, n2: number) => {
+  const high = Math.floor(n1 / 65536) ^ Math.floor(n2 / 65536);
+  const low = (n1 & 0xffff) ^ (n2 & 0xffff);
+  return high * 65536 + low;
+};
 
 export const modn = (n: number, m: number) => Number(BigInt(n) % BigInt(m));
 
