@@ -1,5 +1,5 @@
 import { isEqualArr, sum } from "../../lib/array";
-import { memoize, modn, shiftRight, xor } from "../../lib/general";
+import { memoize, modn, shiftLeft, shiftRight, xor } from "../../lib/general";
 
 export default function solution(input: string) {
   const secrets = input.split("\n").map(Number);
@@ -13,12 +13,12 @@ const mix = (secret: number, num: number) => xor(secret, num);
 const prune = (secret: number) => modn(secret, 16777216);
 
 const ops = [
-  (secret: number) => secret * 64,
-  (secret: number) => Math.floor(shiftRight(secret, 5)),
-  (secret: number) => secret * 2048,
+  (secret: number) => shiftLeft(secret, 6),
+  (secret: number) => shiftRight(secret, 5),
+  (secret: number) => shiftLeft(secret, 11),
 ];
 
-const runSequence = memoize((num: number) => {
+const runSequence = (num: number) => {
   let secret = num;
   for (let j = 0; j < ops.length; j++) {
     const op = ops[j];
@@ -27,7 +27,7 @@ const runSequence = memoize((num: number) => {
     secret = prune(secret);
   }
   return secret;
-});
+};
 
 const getNSthSecret = (secret: number) => {
   for (let i = 0; i < 2000; i++) {
@@ -49,27 +49,27 @@ const solve2 = (secrets: number[]) => {
   const bananas = [];
   for (let i = 0; i < secrets.length; i++) {
     let secret = secrets[i];
-    const results = [secret % 10];
+    const results = [modn(secret, 10)];
 
     for (let j = 0; j < 2000; j++) {
       secret = runSequence(secret);
-      results.push(secret % 10);
+      results.push(modn(secret, 10));
     }
-    const changes = results
-      .map((val, j) => (j === 0 ? 0 : val - results[j - 1]))
-      .slice(1);
+    const changes = results.map((val, j) => (j === 0 ? 0 : val - results[j - 1]));
+    changes.unshift(0);
 
-    const seqI = changes.findIndex((_, ci) => {
-      const seq = changes.slice(ci, ci + CHANGE_SEQUENCE.length);
-      if (seq.length !== CHANGE_SEQUENCE.length) return false;
-      return seq.every((v, i) => v === CHANGE_SEQUENCE[i]);
-    });
-
-    if (seqI !== -1) {
-      bananas.push(results[seqI + 4]);
+    let max = -1;
+    for (let j = 0; j < changes.length; j++) {
+      const seq = changes.slice(j, j + CHANGE_SEQUENCE.length);
+      if (isEqualArr(seq, CHANGE_SEQUENCE)) {
+        max = Math.max(max, results[j + 2]);
+      }
     }
+
+    if (max !== -1) bananas.push(max);
   }
   return sum(bananas);
 };
 
 // 1102 too low
+// 1115 too low
