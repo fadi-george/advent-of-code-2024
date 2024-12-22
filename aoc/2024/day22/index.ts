@@ -11,8 +11,8 @@ const mix = (secret: number, num: number) => xor(secret, num);
 const prune = (secret: number) => modn(secret, 16777216);
 
 const runSequence = (secret: number): number => {
-  secret = prune(mix(secret, shiftLeft(secret, 6)));
-  secret = mix(secret, shiftRight(secret, 5));
+  secret = prune(mix(secret, secret << 6));
+  secret = mix(secret, secret >> 5);
   secret = mix(secret, shiftLeft(secret, 11));
   return prune(secret);
 };
@@ -32,11 +32,11 @@ const getMostBananas = (secrets: number[]) => {
 
   for (let i = 0; i < secrets.length; i++) {
     let secret = secrets[i];
-    const digits = [modn(secret, 10)];
+    const digits = [secret % 10];
 
     for (let j = 0; j < 2000; j++) {
       secret = runSequence(secret);
-      digits.push(modn(secret, 10));
+      digits.push(secret % 10);
     }
 
     const changes = [];
