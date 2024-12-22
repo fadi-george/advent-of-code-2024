@@ -45,49 +45,53 @@ const solve = (secrets: number[]) => {
 };
 
 const solve2 = (secrets: number[]) => {
-  const SEQUENCES = [];
-  for (let n1 = -9; n1 <= 9; n1++) {
-    for (let n2 = -9; n2 <= 9; n2++) {
-      for (let n3 = -9; n3 <= 9; n3++) {
-        for (let n4 = -9; n4 <= 9; n4++) {
-          SEQUENCES.push([n1, n2, n3, n4]);
-        }
-      }
+  // const SEQUENCES = [];
+  // for (let n1 = -9; n1 <= 9; n1++) {
+  //   for (let n2 = -9; n2 <= 9; n2++) {
+  //     for (let n3 = -9; n3 <= 9; n3++) {
+  //       for (let n4 = -9; n4 <= 9; n4++) {
+  //         SEQUENCES.push([n1, n2, n3, n4]);
+  //       }
+  //     }
+  //   }
+  // }
+
+  let maxBananas = -1;
+  const diffMap = new Map<string, number[]>();
+
+  for (let i = 0; i < secrets.length; i++) {
+    let secret = secrets[i];
+    const digits = [modn(secret, 10)];
+
+    for (let j = 0; j < 2000; j++) {
+      secret = runSequence(secret);
+      digits.push(modn(secret, 10));
+    }
+
+    const changes = [];
+    for (let j = 1; j < digits.length; j++) {
+      changes.push(digits[j] - digits[j - 1]);
+    }
+
+    let innerMap = new Map<string, number>();
+    for (let j = 0; j < changes.length; j++) {
+      const seq = changes.slice(j, j + 4);
+      if (seq.length !== 4) continue;
+      if (innerMap.has(seq.toString())) continue;
+
+      // keep track of the max for each sequence
+      innerMap.set(seq.toString(), digits[j + 4]);
+    }
+
+    for (const [key, val] of innerMap.entries()) {
+      const diffVal = diffMap.get(key) ?? [];
+      diffMap.set(key, [...diffVal, val]);
     }
   }
 
-  let maxBananas = -1;
-  for (const sequence of SEQUENCES) {
-    console.log(sequence);
-    // check each sequence for all secrets
-    const innerMax = [];
-    for (let i = 0; i < secrets.length; i++) {
-      let secret = secrets[i];
-      const digits = [modn(secret, 10)];
-
-      for (let j = 0; j < 2000; j++) {
-        secret = runSequence(secret);
-        digits.push(modn(secret, 10));
-      }
-
-      const changes = [];
-      for (let j = 1; j < digits.length; j++) {
-        changes.push(digits[j] - digits[j - 1]);
-      }
-
-      let max = -1;
-      for (let j = 0; j < changes.length; j++) {
-        const seq = changes.slice(j, j + 4);
-        if (seq.length !== 4) continue;
-        if (isEqualArr(seq, sequence)) {
-          max = Math.max(max, digits[j + 4]);
-        }
-      }
-      if (max !== -1) {
-        innerMax.push(max);
-      }
-    }
-    maxBananas = Math.max(maxBananas, sum(innerMax));
+  for (const [key, val] of diffMap.entries()) {
+    const bananas = sum(val);
+    maxBananas = Math.max(maxBananas, bananas);
   }
 
   return maxBananas;
