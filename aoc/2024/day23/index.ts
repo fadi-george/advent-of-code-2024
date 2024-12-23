@@ -1,5 +1,3 @@
-import { MinPriorityQueue } from "@datastructures-js/priority-queue";
-
 export default function solution(input: string) {
   const lines = input.split("\n");
 
@@ -16,11 +14,10 @@ export default function solution(input: string) {
     connections[b].add(a);
   }
 
-  const { lan, count } = getThreeConnected(connections);
-  console.log("1");
-  const password = getPassword(connections, network);
-  console.log("2");
-  return { part1: count, part2: password };
+  return {
+    part1: getThreeConnected(connections),
+    part2: getPassword(connections),
+  };
 }
 
 type Connections = Record<string, Set<string>>;
@@ -42,72 +39,35 @@ const getThreeConnected = (connections: Connections) => {
   // find one that have a node that starts with "t"
   const histArr = [...results].filter((r) => r.split(",").some((n) => n.startsWith("t")));
 
-  return { lan: results, count: histArr.length };
+  return histArr.length;
 };
 
-// const buildLanParty = (connections: Connections, n: number) => {
-//   const results = new Set<string>();
-//   for (const [node, neighbors] of Object.entries(connections)) {
-//     for (const neighbor of neighbors) {
-//       const neighborNodes = connections[neighbor];
-//       const intersection = neighborNodes.intersection(neighbors);
-//       console.log(node, neighbor, intersection);
-//     }
-//   }
-
-//   return results;
-// };
-
-type Info = {
-  comps: string[];
-  group: Set<string>;
-};
-const getPassword = (connections: Connections, network: [string, string][]) => {
-  let res = "";
-  // Helper function to check if a group of computers are all connected to each other
-  const isCompleteGroup = (comps: string[]) => {
-    for (let i = 0; i < comps.length; i++) {
-      for (let j = i + 1; j < comps.length; j++) {
-        if (!connections[comps[i]].has(comps[j])) {
-          return false;
-        }
-      }
-    }
+const getPassword = (connections: Connections) => {
+  // Helper function to check if a new node can be added to existing group
+  const canAddToGroup = (group: Set<string>, newNode: string): boolean => {
+    for (const node of group) if (!connections[node].has(newNode)) return false;
     return true;
   };
 
-  // Get all unique computers
-  const allComputers = [...new Set(network.flat())];
+  // e.g. kh, tc, qp ...
+  const allComputers = Object.keys(connections);
+  let maxGroup = new Set<string>();
 
-  // Start with the largest possible group size and work down
-  for (let size = allComputers.length; size >= 1; size--) {
-    // Generate combinations of computers of the current size
-    const queue = [[[], allComputers, 0]];
+  // Recursive function with backtracking
+  const findGroup = (current: Set<string>, pos: number) => {
+    if (current.size > maxGroup.size) maxGroup = new Set(current);
 
-    while (queue.length > 0) {
-      const [current, remaining, start] = queue.shift()!;
-
-      if (current.length === size) {
-        if (isCompleteGroup(current)) {
-          // Found the largest complete group
-          res = current.sort().join(",");
-          break;
-        }
-        continue;
-      }
-
-      for (let i = start; i < remaining.length; i++) {
-        const newCurrent = [...current, remaining[i]];
-        // Early pruning: check if the current group is still valid
-        if (isCompleteGroup(newCurrent)) {
-          queue.push([newCurrent, remaining, i + 1]);
-        }
+    // Try adding each remaining computer
+    for (let i = pos; i < allComputers.length; i++) {
+      const computer = allComputers[i];
+      if (canAddToGroup(current, computer)) {
+        current.add(computer);
+        findGroup(current, i + 1);
+        current.delete(computer);
       }
     }
-    if (res) break;
-  }
+  };
 
-  console.log("res", res);
-
-  return res;
+  findGroup(new Set(), 0);
+  return [...maxGroup].sort().join(",");
 };
