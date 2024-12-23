@@ -43,31 +43,28 @@ const getThreeConnected = (connections: Connections) => {
 };
 
 const getPassword = (connections: Connections) => {
-  // Helper function to check if a new node can be added to existing group
-  const canAddToGroup = (group: Set<string>, newNode: string): boolean => {
-    for (const node of group) if (!connections[node].has(newNode)) return false;
-    return true;
-  };
+  let maxClique: string[] = [];
 
-  // e.g. kh, tc, qp ...
-  const allComputers = Object.keys(connections);
-  let maxGroup = new Set<string>();
+  const bronKerbosch = (
+    clique: string[], // R: current clique being built
+    candidates: string[], // P: potential vertices to add to clique
+    excluded: string[] // X: vertices already processed/excluded
+  ) => {
+    if (candidates.length === 0 && excluded.length === 0) {
+      if (clique.length > maxClique.length) maxClique = clique.slice();
+      return;
+    }
 
-  // Recursive function with backtracking
-  const findGroup = (current: Set<string>, pos: number) => {
-    if (current.size > maxGroup.size) maxGroup = new Set(current);
-
-    // Try adding each remaining computer
-    for (let i = pos; i < allComputers.length; i++) {
-      const computer = allComputers[i];
-      if (canAddToGroup(current, computer)) {
-        current.add(computer);
-        findGroup(current, i + 1);
-        current.delete(computer);
-      }
+    for (let vertex of candidates) {
+      let newClique = clique.concat(vertex);
+      let newCandidates = candidates.filter((u) => connections[vertex].has(u));
+      let newExcluded = excluded.filter((u) => connections[vertex].has(u));
+      bronKerbosch(newClique, newCandidates, newExcluded);
+      candidates.splice(candidates.indexOf(vertex), 1);
+      excluded.push(vertex);
     }
   };
 
-  findGroup(new Set(), 0);
-  return [...maxGroup].sort().join(",");
+  bronKerbosch([], Object.keys(connections), []);
+  return maxClique.sort().join(",");
 };
