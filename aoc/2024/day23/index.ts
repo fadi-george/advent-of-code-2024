@@ -1,3 +1,5 @@
+import { MaxPriorityQueue } from "@datastructures-js/priority-queue";
+
 export default function solution(input: string) {
   const lines = input.split("\n");
 
@@ -43,28 +45,26 @@ const getThreeConnected = (connections: Connections) => {
 };
 
 const getPassword = (connections: Connections) => {
-  let maxClique: string[] = [];
+  const maxLen = Math.max(...Object.values(connections).map((v) => v.size));
+  const keys = Object.keys(connections).sort();
 
-  const bronKerbosch = (
-    clique: string[], // R: current clique being built
-    candidates: string[], // P: potential vertices to add to clique
-    excluded: string[] // X: vertices already processed/excluded
-  ) => {
-    if (candidates.length === 0 && excluded.length === 0) {
-      if (clique.length > maxClique.length) maxClique = clique.slice();
-      return;
+  const q = new MaxPriorityQueue<string[]>((v) => v.length);
+  for (const key of keys) q.enqueue([key]);
+
+  while (q.size() > 0) {
+    const current = q.dequeue()!;
+
+    for (const key of keys) {
+      // since we will return a sorted list already, can skip if the last key is greater than the current key
+      const lastKey = current[current.length - 1];
+      if (lastKey >= key) continue;
+
+      const con = connections[key];
+
+      // all computers connected
+      if (current.every((c) => con.has(c))) q.enqueue([...current, key]);
+      else if (current.length === maxLen) return current.join(",");
     }
-
-    for (let vertex of candidates) {
-      let newClique = clique.concat(vertex);
-      let newCandidates = candidates.filter((u) => connections[vertex].has(u));
-      let newExcluded = excluded.filter((u) => connections[vertex].has(u));
-      bronKerbosch(newClique, newCandidates, newExcluded);
-      candidates.splice(candidates.indexOf(vertex), 1);
-      excluded.push(vertex);
-    }
-  };
-
-  bronKerbosch([], Object.keys(connections), []);
-  return maxClique.sort().join(",");
+  }
+  return null;
 };
