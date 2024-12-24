@@ -1,5 +1,3 @@
-import { PriorityQueue } from "@datastructures-js/priority-queue";
-
 export default function solution(input: string) {
   const lines = input.split("\n");
   const connections: Record<string, Set<string>> = {};
@@ -45,11 +43,11 @@ const getPassword = (connections: Connections) => {
     nextNodes.set(key, val);
   }
 
-  const q = new PriorityQueue<string[]>((a, b) => b.length - a.length);
-  for (const key of keys) q.enqueue([key]);
+  const stack: string[][] = [];
+  for (const key of keys) stack.push([key]);
 
-  while (q.size() > 0) {
-    const current = q.dequeue()!;
+  while (stack.length > 0) {
+    const current = stack.pop()!;
     if (current.length === maxLen) return current.join(",");
 
     const lastKey = current[current.length - 1];
@@ -58,7 +56,7 @@ const getPassword = (connections: Connections) => {
     for (const key of possibleNext) {
       const con = connections[key];
       // check if all computers connected
-      if (current.every((c) => con.has(c))) q.enqueue([...current, key]);
+      if (current.every((c) => con.has(c))) stack.push([...current, key]);
     }
   }
   return null;
