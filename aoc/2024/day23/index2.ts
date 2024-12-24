@@ -1,5 +1,4 @@
-import { MaxPriorityQueue } from "@datastructures-js/priority-queue";
-
+// alternative using Bron-Kerbosch algorithm
 export default function solution(input: string) {
   const lines = input.split("\n");
 
@@ -40,35 +39,33 @@ const getThreeConnected = (connections: Connections) => {
 
   // find one that have a node that starts with "t"
   const histArr = [...results].filter((r) => r.split(",").some((n) => n.startsWith("t")));
+
   return histArr.length;
 };
 
 const getPassword = (connections: Connections) => {
-  const maxLen = Math.max(...Object.values(connections).map((v) => v.size));
-  const keys = Object.keys(connections).sort();
+  let maxClique: string[] = [];
 
-  const q = new MaxPriorityQueue<{ keys: string[]; i: number }>((v) => keys.length);
-  for (const [i, key] of keys.entries()) q.enqueue({ keys: [key], i });
-
-  while (q.size() > 0) {
-    const { keys: current, i } = q.dequeue()!;
-
-    if (current.length === maxLen) return current.join(",");
-
-    // since we will return a sorted list already, can skip if the last key is greater than the current key
-    const lastKey = current[current.length - 1];
-
-    for (let j = i + 1; j < keys.length; j++) {
-      const key = keys[j];
-      if (!key) continue;
-      // skip same or lexicographically smaller key
-      // e.g. 'ka' < 'ka' is false and 'ta' < 'ka' is false
-      if (lastKey >= key) continue;
-
-      const con = connections[key];
-      // check if all computers connected
-      if (current.every((c) => con.has(c))) q.enqueue({ keys: [...current, key], i: j });
+  const bronKerbosch = (
+    clique: string[], // R: current clique being built
+    candidates: string[], // P: potential vertices to add to clique
+    excluded: string[] // X: vertices already processed/excluded
+  ) => {
+    if (candidates.length === 0 && excluded.length === 0) {
+      if (clique.length > maxClique.length) maxClique = clique.slice();
+      return;
     }
-  }
-  return null;
+
+    for (let vertex of candidates) {
+      let newClique = clique.concat(vertex);
+      let newCandidates = candidates.filter((u) => connections[vertex].has(u));
+      let newExcluded = excluded.filter((u) => connections[vertex].has(u));
+      bronKerbosch(newClique, newCandidates, newExcluded);
+      candidates.splice(candidates.indexOf(vertex), 1);
+      excluded.push(vertex);
+    }
+  };
+
+  bronKerbosch([], Object.keys(connections), []);
+  return maxClique.sort().join(",");
 };
