@@ -2,17 +2,12 @@
 export default function solution(input: string) {
   const lines = input.split("\n");
 
-  // const graph = new Map<string, string[]>();
   const connections: Record<string, Set<string>> = {};
-  const network: [string, string][] = [];
 
   for (const line of lines) {
     const [a, b] = line.split("-");
-    network.push([a, b]);
-    if (!connections[a]) connections[a] = new Set();
-    if (!connections[b]) connections[b] = new Set();
-    connections[a].add(b);
-    connections[b].add(a);
+    (connections[a] ??= new Set()).add(b);
+    (connections[b] ??= new Set()).add(a);
   }
 
   return {

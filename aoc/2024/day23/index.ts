@@ -1,25 +1,16 @@
-import { MaxPriorityQueue } from "@datastructures-js/priority-queue";
+import { PriorityQueue } from "@datastructures-js/priority-queue";
 
 export default function solution(input: string) {
   const lines = input.split("\n");
-
-  // const graph = new Map<string, string[]>();
   const connections: Record<string, Set<string>> = {};
-  const network: [string, string][] = [];
 
   for (const line of lines) {
     const [a, b] = line.split("-");
-    network.push([a, b]);
-    if (!connections[a]) connections[a] = new Set();
-    if (!connections[b]) connections[b] = new Set();
-    connections[a].add(b);
-    connections[b].add(a);
+    (connections[a] ??= new Set()).add(b);
+    (connections[b] ??= new Set()).add(a);
   }
 
-  return {
-    part1: getThreeConnected(connections),
-    part2: getPassword(connections),
-  };
+  return { part1: getThreeConnected(connections), part2: getPassword(connections) };
 }
 
 type Connections = Record<string, Set<string>>;
@@ -47,27 +38,27 @@ const getPassword = (connections: Connections) => {
   const maxLen = Math.max(...Object.values(connections).map((v) => v.size));
   const keys = Object.keys(connections).sort();
 
-  const q = new MaxPriorityQueue<{ keys: string[]; i: number }>((v) => keys.length);
-  for (const [i, key] of keys.entries()) q.enqueue({ keys: [key], i });
+  // Pre-compute valid next nodes for each node
+  const nextNodes = new Map<string, string[]>();
+  for (const key of keys) {
+    const val = keys.filter((k) => k > key && connections[key].has(k));
+    nextNodes.set(key, val);
+  }
+
+  const q = new PriorityQueue<string[]>((a, b) => b.length - a.length);
+  for (const key of keys) q.enqueue([key]);
 
   while (q.size() > 0) {
-    const { keys: current, i } = q.dequeue()!;
-
+    const current = q.dequeue()!;
     if (current.length === maxLen) return current.join(",");
 
-    // since we will return a sorted list already, can skip if the last key is greater than the current key
     const lastKey = current[current.length - 1];
+    const possibleNext = nextNodes.get(lastKey)!;
 
-    for (let j = i + 1; j < keys.length; j++) {
-      const key = keys[j];
-      if (!key) continue;
-      // skip same or lexicographically smaller key
-      // e.g. 'ka' < 'ka' is false and 'ta' < 'ka' is false
-      if (lastKey >= key) continue;
-
+    for (const key of possibleNext) {
       const con = connections[key];
       // check if all computers connected
-      if (current.every((c) => con.has(c))) q.enqueue({ keys: [...current, key], i: j });
+      if (current.every((c) => con.has(c))) q.enqueue([...current, key]);
     }
   }
   return null;
