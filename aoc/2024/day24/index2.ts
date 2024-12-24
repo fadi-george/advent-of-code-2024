@@ -1,162 +1,125 @@
-type Operation = { (vals: boolean[]): boolean };
+export default function solution(input: string) {
+  const [wires, gateLines] = input.split("\n\n");
+  const wireMap = new Map<string, number>();
+  for (const wire of wires.split("\n")) {
+    const [name, value] = wire.split(": ");
+    wireMap.set(name, +value);
+  }
 
-interface Node {
-  inputs: string[];
-  operation: string;
+  const gates = gateLines.split("\n").map((line) => {
+    const [input, output] = line.split(" -> ");
+    const [left, op, right] = input.split(" ");
+    return { left, op, right, output };
+  });
+
+  const p1 = run(wireMap, gates);
+  const p2 = getSwappedWires(wireMap, gates);
+  return { part1: p1, part2: p2 };
 }
 
-type Graph = Map<string, Node>;
+type WireMap = Map<string, number>;
+type Gate = { left: string; op: string; right: string; output: string };
 
-const operations = new Map<string, Operation>([
-  ["OR", (vals) => vals[0] || vals[1]],
-  ["AND", (vals) => vals[0] && vals[1]],
-  ["XOR", (vals) => vals[0] !== vals[1]],
-  ["TRUE", (_) => true],
-  ["FALSE", (_) => false],
-]);
+const run = (wireMap: WireMap, gates: Gate[]) => {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    gates.forEach((gate) => {
+      const left = wireMap.get(gate.left)!;
+      const right = wireMap.get(gate.right)!;
 
-const parseInput = (input: string) => {
-  const [inputText, wiringText] = input.split("\n\n");
+      let val = 0;
+      switch (gate.op) {
+        case "AND":
+          val = left & right;
+          break;
+        case "OR":
+          val = left | right;
+          break;
+        case "XOR":
+          val = left ^ right;
+          break;
+      }
 
-  const wiring = new Map(
-    wiringText
-      .split("\n")
-      .filter((x) => x != "")
-      .map((line) => {
-        const elems = line.split(" ");
-        return [elems[4], { inputs: [elems[0], elems[2]], operation: elems[1] }];
-      })
-  );
+      const current = wireMap.get(gate.output);
+      if (current !== val) {
+        wireMap.set(gate.output, val);
+        changed = true;
+      }
+    });
+  }
 
-  inputText.split("\n").forEach((line) => {
-    const input = line.split(": ");
-    if (input[1] === "1") wiring.set(input[0], { inputs: [], operation: "TRUE" });
-    if (input[1] === "0") wiring.set(input[0], { inputs: [], operation: "FALSE" });
+  let res: number[] = [];
+  [...wireMap.entries()].forEach(([key, value]) => {
+    if (key.startsWith("z")) {
+      const index = +key.slice(1);
+      res[index] = value;
+    }
   });
 
-  return wiring;
+  const val = res.reverse().join("");
+  return parseInt(val, 2);
 };
 
-const evaluate = (nodeName: string, wiring: Graph): boolean => {
-  let node = wiring.get(nodeName)!;
-  if (node.inputs.length === 0) return operations.get(node.operation)!([]);
-
-  // // copy the wiring so we don't mess everything up
-  // wiring = new Map([...wiring].map(([name, node]) => [name, {inputs: node.inputs.slice(), operation: node.operation}]));
-
-  // // get the copied node
-  // node = wiring.get(nodeName)!;
-  const inputs = node.inputs.map((node) => evaluate(node, wiring));
-  const value = operations.get(node.operation)!(inputs);
-  node.inputs = [];
-  node.operation = value ? "TRUE" : "FALSE";
-  return value;
-};
-
-const convertToDecimal = (nodes: string[], wiring: Graph): number =>
-  [
-    ...nodes.map(
-      (nodeName) => [nodeName, evaluate(nodeName, wiring)] as [string, boolean]
-    ),
-  ]
-    .sort((lhs, rhs) => lhs[0].localeCompare(rhs[0]))
-    .map(([name, val], idx) => (val ? 2 ** idx : undefined))
-    .filter((x) => x !== undefined)
-    .reduce((lhs, rhs) => lhs + rhs);
-
-const getDecimalValueOfNodesStartingWith = (c: string, wiring: Graph): number =>
-  convertToDecimal([...wiring.keys().filter((node) => node[0] === c)], wiring);
-
-const part1 = (input: string): number => {
-  const wiring = parseInput(input);
-  // const order = topologicalSort(wiring);
-
-  return getDecimalValueOfNodesStartingWith("z", wiring);
-};
-
-const part2 = (input: string) => {
-  const wiring = parseInput(input);
+// Credits: to rvodden - aoc 2024 day 24 part 2
+const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
   const swaps = new Set<string>();
 
-  console.log({
-    wiring,
-  });
+  const findGate = (left: string, right: string, op: string) =>
+    gates.find(
+      (g) =>
+        g.op === op &&
+        ((g.left === left && g.right === right) || (g.left === right && g.right === left))
+    )?.output;
 
-  const getNodeName = (inputs: string[], operation: string): string | undefined => {
-    const entry = wiring
-      .entries()
-      .find(
-        ([_, node]) =>
-          node.operation === operation &&
-          inputs.every((input) => node.inputs.includes(input))
-      );
-    return entry ? entry[0] : undefined;
+  const swap = (a: string, b: string) => {
+    [wireMap.set(a, wireMap.get(b)!), wireMap.set(b, wireMap.get(a)!)];
+    swaps.add(a).add(b);
   };
 
-  const swap = (lhs: string, rhs: string) => {
-    const temp = wiring.get(lhs);
-    wiring.set(lhs, wiring.get(rhs)!);
-    wiring.set(rhs, temp!);
-    swaps.add(lhs);
-    swaps.add(rhs);
+  let carryIn: string | undefined;
+  let carryOut: string | undefined;
+
+  const swapIfZOutput = (nodeToCheck: string, output: string) => {
+    if (nodeToCheck?.startsWith("z")) {
+      swap(nodeToCheck, output);
+      return output;
+    }
+    return nodeToCheck;
   };
 
-  let carryIn: string | undefined = undefined;
-  let carryOut: string | undefined = undefined;
+  for (let i = 0; i < 45; i++) {
+    const nI = i.toString().padStart(2, "0");
+    const [x, y] = [`x${nI}`, `y${nI}`];
 
-  for (const number of Array(45).keys()) {
-    const label = number.toString().padStart(2, "0");
+    let node0 = findGate(x, y, "XOR")!; // Sum without carry
+    let node1 = findGate(x, y, "AND")!; // Potential carry
+    let output = node0;
 
-    // *** half adder ***
-    // x__ XOR y__ -> node0
-    // x__ AND y__ -> node1
-    // carryIn AND node0 -> node2
-    // carryIn XOR node0 -> output
-    // node1 OR node2 -> carry1
-    let node0 = getNodeName(["x" + label, "y" + label], "XOR")!;
-    let node1 = getNodeName(["x" + label, "y" + label], "AND")!;
-    let output: string;
-
-    if (carryIn !== undefined) {
-      let node2 = getNodeName([carryIn, node0], "AND");
-      if (node2 === undefined) {
+    if (carryIn) {
+      let node2 = findGate(carryIn, node0, "AND");
+      if (!node2) {
         swap(node0, node1);
         [node0, node1] = [node1, node0];
-        node2 = getNodeName([carryIn, node0], "AND")!;
+        node2 = findGate(carryIn, node0, "AND")!;
       }
 
-      output = getNodeName([carryIn, node0], "XOR")!;
-      if (node0?.startsWith("z")) {
-        swap(node0, output!);
-        [output, node0] = [node0, output];
-      }
-      if (node1?.startsWith("z")) {
-        swap(node1, output!);
-        [output, node1] = [node1, output];
-      }
-      if (node2?.startsWith("z")) {
-        swap(node2, output!);
-        [output, node2] = [node2, output];
-      }
+      output = findGate(carryIn, node0, "XOR")!;
 
-      carryOut = getNodeName([node1, node2], "OR");
+      node0 = swapIfZOutput(node0, output);
+      node1 = swapIfZOutput(node1, output);
+      node2 = swapIfZOutput(node2!, output);
+
+      carryOut = findGate(node1, node2, "OR");
     }
 
-    if (carryOut?.startsWith("z") && carryOut != "z45") {
+    if (carryOut?.startsWith("z") && carryOut !== "z45") {
       swap(carryOut, output!);
       [carryOut, output] = [output, carryOut];
     }
 
-    if (carryIn) carryIn = carryOut;
-    else carryIn = node1;
+    carryIn = carryIn ? carryOut : node1;
   }
 
   return [...swaps].sort().join(",");
 };
-
-// export { part1, expectedFirstSolution, part2, expectedSecondSolution };
-export default function solution(input: string) {
-  const p1 = part1(input);
-  const p2 = part2(input);
-  return { part1: p1, part2: p2 };
-}

@@ -8,14 +8,13 @@ describe("day 24", () => {
   test("example input", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
-    // expect(result.part1).toBe(7);
-    // expect(result.part2).toBe("co,de,ka,ta");
+    expect(result.part1).toBe(4);
   });
 
   test("puzzle input", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
-    // expect(result.part1).toBe(1046);
-    // expect(result.part2).toBe("de,id,ke,ls,po,sn,tf,tl,tm,uj,un,xw,yz");
+    expect(result.part1).toBe(48806532300520);
+    expect(result.part2).toBe("ddn,kqh,nhs,nnf,wrc,z09,z20,z34");
   });
 });
