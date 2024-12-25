@@ -62,5 +62,50 @@ const run = (wireMap: WireMap, gates: Gate[]) => {
 };
 
 const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
-  return "";
+  const zCount = [...wireMap.entries()].filter(([key]) => key.startsWith("z")).length;
+  let swaps: string[] = [];
+  console.log({ gates });
+
+  // order can be different
+  const getGate = (x?: string, y?: string, op?: string) =>
+    gates.find(
+      (gate) =>
+        (gate.op === op && gate.left === x && gate.right === y) ||
+        (gate.left === y && gate.right === x)
+    );
+
+  // return "";
+  let carryIn: string | undefined;
+  let carryOut: string | undefined;
+  for (let i = 0; i < zCount; i++) {
+    const nI = i.toString().padStart(2, "0");
+    const [x, y] = [`x${nI}`, `y${nI}`];
+
+    // half adder
+    if (i === 0) {
+      const sum = getGate(x, y, "XOR")?.output;
+      carryOut = getGate(x, y, "AND")?.output;
+      carryIn = carryOut;
+
+      if (sum !== "z00") {
+        throw new Error("sum is not z00");
+      }
+
+      continue;
+    }
+
+    // full adder
+    let xor1 = getGate(x, y, "XOR")?.output;
+    let sum = getGate(xor1, carryIn, "XOR")?.output;
+    let and1 = getGate(xor1, carryIn, "AND")?.output;
+    let and2 = getGate(x, y, "AND")?.output;
+    carryOut = getGate(and1, and2, "OR")?.output;
+    carryIn = carryOut;
+
+    if (sum !== `z${nI}`) {
+      throw new Error(`sum is not z${i}`);
+    }
+  }
+
+  return swaps.sort().join(",");
 };
