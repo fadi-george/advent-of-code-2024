@@ -8,12 +8,12 @@ describe("day 5", () => {
   test("example input", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
-    expect(result.part1).toBe("");
+    expect(result.part1).toBe(3);
   });
 
   test("puzzle input", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
-    expect(result.part1).toBe("");
+    expect(result.part1).toBe(3242);
   });
 });
