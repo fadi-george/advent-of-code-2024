@@ -9,11 +9,13 @@ describe("day 5", () => {
     const input = readFile(`${dirname}/sample.txt`);
     const result = solution(input);
     expect(result.part1).toBe(3);
+    expect(result.part2).toBe("FREE STAR");
   });
 
   test("puzzle input", () => {
     const input = readFile(`${dirname}/input.txt`);
     const result = solution(input);
     expect(result.part1).toBe(3242);
+    expect(result.part2).toBe("FREE STAR");
   });
 });
