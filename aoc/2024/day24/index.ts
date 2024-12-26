@@ -13,7 +13,7 @@ export default function solution(input: string) {
   });
 
   const p1 = run(wireMap, gates);
-  const p2 = getSwappedWires(wireMap, gates);
+  const p2 = getSwappedWires(gates);
   return { part1: p1, part2: p2 };
 }
 
@@ -61,56 +61,67 @@ const run = (wireMap: WireMap, gates: Gate[]) => {
   return parseInt(val, 2);
 };
 
-const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
-  const zCount = [...wireMap.entries()].filter(([key]) => key.startsWith("z")).length;
+const getSwappedWires = (gates: Gate[]) => {
+  const zCount = gates.filter((g) => g.output.startsWith("z")).length;
   let swaps: string[] = [];
-  // console.log({ gates });
-  const gateMap = new Map<string, Gate>();
-  gates.forEach((gate) => {
-    gateMap.set(gate.output, gate);
-  });
 
   // order can be different
   const getGate = (x?: string, y?: string, op?: string) =>
     gates.find(
-      (gate) =>
-        (gate.op === op && gate.left === x && gate.right === y) ||
-        (gate.left === y && gate.right === x)
+      (g) =>
+        g.op === op &&
+        ((g.left === x && g.right === y) || (g.left === y && g.right === x))
     );
 
   // return "";
   let carryIn: string | undefined;
-  // let carryOut: string | undefined;
-  for (let i = 0; i < zCount; i++) {
+  let carryOut: string | undefined;
+
+  for (let i = 0; i < zCount - 1; i++) {
     const nI = i.toString().padStart(2, "0");
-    const [x, y] = [`x${nI}`, `y${nI}`];
+    const [x, y, z] = [`x${nI}`, `y${nI}`, `z${nI}`];
 
     // half adder
     if (i === 0) {
-      const sum = getGate(x, y, "XOR")?.output;
-      carryIn = getGate(x, y, "AND")?.output;
-      // carryIn = carryOut;
+      const sumG = getGate(x, y, "XOR")!;
+      const andG = getGate(x, y, "AND")!;
 
-      if (sum !== "z00") {
-        throw new Error("sum is not z00");
+      if (sumG.output !== "z00") {
+        let tmp = sumG.output;
+        sumG.output = "z00";
+        andG.output = tmp;
       }
-
+      carryIn = andG.output;
       continue;
     }
 
-    // // full adder
-    // let xor1 = getGate(x, y, "XOR")?.output;
-    // let sum = getGate(xor1, carryIn, "XOR")?.output;
-    // let and1 = getGate(xor1, carryIn, "AND")?.output;
-    // let and2 = getGate(x, y, "AND")?.output;
-    // carryIn = getGate(and1, and2, "OR")?.output;
-    // // carryIn = carryOut;
+    let xor1 = getGate(x, y, "XOR")!;
+    let sumG = getGate(xor1.output, carryIn, "XOR")!;
 
-    // if (sum !== `z${nI}`) {
-    //   throw new Error(`sum is not z${i}`);
-    // }
+    // z output is disconnected from the first xor gate
+    if (!sumG) {
+      const andG = getGate(x, y, "AND")!;
+      let tmp = xor1.output;
+      swaps.push(andG.output, xor1.output);
+      xor1.output = andG.output;
+      andG.output = tmp;
+      sumG = getGate(xor1.output, carryIn, "XOR")!;
+    }
 
-    // work backwards from output
+    // z output is disconnected from the second/last xor gate
+    // e.g Xn xor Yn = Zn
+    if (sumG.output !== z) {
+      swaps.push(sumG.output, z);
+      let tmp = sumG.output;
+      let zG = gates.find((g) => g.output === z)!;
+      sumG.output = z;
+      zG.output = tmp;
+    }
+
+    let and1 = getGate(xor1.output, carryIn, "AND")?.output;
+    let and2 = getGate(x, y, "AND")?.output;
+    carryOut = getGate(and1, and2, "OR")?.output;
+    carryIn = carryOut;
   }
 
   return swaps.sort().join(",");
