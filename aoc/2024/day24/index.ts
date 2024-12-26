@@ -64,7 +64,11 @@ const run = (wireMap: WireMap, gates: Gate[]) => {
 const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
   const zCount = [...wireMap.entries()].filter(([key]) => key.startsWith("z")).length;
   let swaps: string[] = [];
-  console.log({ gates });
+  // console.log({ gates });
+  const gateMap = new Map<string, Gate>();
+  gates.forEach((gate) => {
+    gateMap.set(gate.output, gate);
+  });
 
   // order can be different
   const getGate = (x?: string, y?: string, op?: string) =>
@@ -76,7 +80,7 @@ const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
 
   // return "";
   let carryIn: string | undefined;
-  let carryOut: string | undefined;
+  // let carryOut: string | undefined;
   for (let i = 0; i < zCount; i++) {
     const nI = i.toString().padStart(2, "0");
     const [x, y] = [`x${nI}`, `y${nI}`];
@@ -84,8 +88,8 @@ const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
     // half adder
     if (i === 0) {
       const sum = getGate(x, y, "XOR")?.output;
-      carryOut = getGate(x, y, "AND")?.output;
-      carryIn = carryOut;
+      carryIn = getGate(x, y, "AND")?.output;
+      // carryIn = carryOut;
 
       if (sum !== "z00") {
         throw new Error("sum is not z00");
@@ -94,17 +98,19 @@ const getSwappedWires = (wireMap: WireMap, gates: Gate[]) => {
       continue;
     }
 
-    // full adder
-    let xor1 = getGate(x, y, "XOR")?.output;
-    let sum = getGate(xor1, carryIn, "XOR")?.output;
-    let and1 = getGate(xor1, carryIn, "AND")?.output;
-    let and2 = getGate(x, y, "AND")?.output;
-    carryOut = getGate(and1, and2, "OR")?.output;
-    carryIn = carryOut;
+    // // full adder
+    // let xor1 = getGate(x, y, "XOR")?.output;
+    // let sum = getGate(xor1, carryIn, "XOR")?.output;
+    // let and1 = getGate(xor1, carryIn, "AND")?.output;
+    // let and2 = getGate(x, y, "AND")?.output;
+    // carryIn = getGate(and1, and2, "OR")?.output;
+    // // carryIn = carryOut;
 
-    if (sum !== `z${nI}`) {
-      throw new Error(`sum is not z${i}`);
-    }
+    // if (sum !== `z${nI}`) {
+    //   throw new Error(`sum is not z${i}`);
+    // }
+
+    // work backwards from output
   }
 
   return swaps.sort().join(",");

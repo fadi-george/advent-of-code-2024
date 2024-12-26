@@ -26,3 +26,6 @@ dist-ssr
 # Aoc
 aoc/**/*.txt
 !aoc/**/sample*.txt
+
+# Draw
+draw/**
