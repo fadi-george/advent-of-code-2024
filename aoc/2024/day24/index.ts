@@ -73,9 +73,7 @@ const getSwappedWires = (gates: Gate[]) => {
         ((g.left === x && g.right === y) || (g.left === y && g.right === x))
     );
 
-  // return "";
   let carryIn: string | undefined;
-  let carryOut: string | undefined;
 
   for (let i = 0; i < zCount - 1; i++) {
     const nI = i.toString().padStart(2, "0");
@@ -86,6 +84,7 @@ const getSwappedWires = (gates: Gate[]) => {
       const sumG = getGate(x, y, "XOR")!;
       const andG = getGate(x, y, "AND")!;
 
+      if (!sumG) break;
       if (sumG.output !== "z00") {
         let tmp = sumG.output;
         sumG.output = "z00";
@@ -98,7 +97,7 @@ const getSwappedWires = (gates: Gate[]) => {
     let xor1 = getGate(x, y, "XOR")!;
     let sumG = getGate(xor1.output, carryIn, "XOR")!;
 
-    // z output is disconnected from the first xor gate
+    // z output is disconnected from the first xor gate so swap
     if (!sumG) {
       const andG = getGate(x, y, "AND")!;
       let tmp = xor1.output;
@@ -108,8 +107,7 @@ const getSwappedWires = (gates: Gate[]) => {
       sumG = getGate(xor1.output, carryIn, "XOR")!;
     }
 
-    // z output is disconnected from the second/last xor gate
-    // e.g Xn xor Yn = Zn
+    // z output is disconnected from the second/last xor gate so swap
     if (sumG.output !== z) {
       swaps.push(sumG.output, z);
       let tmp = sumG.output;
@@ -118,10 +116,9 @@ const getSwappedWires = (gates: Gate[]) => {
       zG.output = tmp;
     }
 
-    let and1 = getGate(xor1.output, carryIn, "AND")?.output;
-    let and2 = getGate(x, y, "AND")?.output;
-    carryOut = getGate(and1, and2, "OR")?.output;
-    carryIn = carryOut;
+    const and1 = getGate(xor1.output, carryIn, "AND")?.output;
+    const and2 = getGate(x, y, "AND")?.output;
+    carryIn = getGate(and1, and2, "OR")?.output;
   }
 
   return swaps.sort().join(",");
