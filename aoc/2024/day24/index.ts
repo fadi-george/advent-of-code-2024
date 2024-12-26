@@ -75,50 +75,36 @@ const getSwappedWires = (gates: Gate[]) => {
 
   let carryIn: string | undefined;
 
+  // for the real input the gates consist of full adder circuits
+  // except for the first output which is a half adder
   for (let i = 0; i < zCount - 1; i++) {
     const nI = i.toString().padStart(2, "0");
     const [x, y, z] = [`x${nI}`, `y${nI}`, `z${nI}`];
+    const xor1 = getGate(x, y, "XOR")!;
 
-    // half adder
-    if (i === 0) {
-      const sumG = getGate(x, y, "XOR")!;
-      const andG = getGate(x, y, "AND")!;
+    // for first output the carryIn is missing, so this will return undefined (which is fine)
+    let sumG = carryIn ? getGate(xor1.output, carryIn, "XOR") : xor1;
 
-      if (!sumG) break;
-      if (sumG.output !== "z00") {
-        let tmp = sumG.output;
-        sumG.output = "z00";
-        andG.output = tmp;
+    if (!sumG || sumG.output !== z) {
+      // z output is disconnected from the first xor gate so swap
+      if (!sumG) {
+        const andG = getGate(x, y, "AND")!;
+        swaps.push(andG.output, xor1.output);
+        [xor1.output, andG.output] = [andG.output, xor1.output];
+        sumG = carryIn ? getGate(xor1.output, carryIn, "XOR")! : xor1;
       }
-      carryIn = andG.output;
-      continue;
+
+      // z output is disconnected from the second/last xor gate so swap
+      if (sumG.output !== z) {
+        swaps.push(sumG.output, z);
+        let zG = gates.find((g) => g.output === z)!;
+        [sumG.output, zG.output] = [zG.output, sumG.output];
+      }
     }
 
-    let xor1 = getGate(x, y, "XOR")!;
-    let sumG = getGate(xor1.output, carryIn, "XOR")!;
-
-    // z output is disconnected from the first xor gate so swap
-    if (!sumG) {
-      const andG = getGate(x, y, "AND")!;
-      let tmp = xor1.output;
-      swaps.push(andG.output, xor1.output);
-      xor1.output = andG.output;
-      andG.output = tmp;
-      sumG = getGate(xor1.output, carryIn, "XOR")!;
-    }
-
-    // z output is disconnected from the second/last xor gate so swap
-    if (sumG.output !== z) {
-      swaps.push(sumG.output, z);
-      let tmp = sumG.output;
-      let zG = gates.find((g) => g.output === z)!;
-      sumG.output = z;
-      zG.output = tmp;
-    }
-
-    const and1 = getGate(xor1.output, carryIn, "AND")?.output;
+    const and1 = carryIn ? getGate(xor1.output, carryIn, "AND")?.output : undefined;
     const and2 = getGate(x, y, "AND")?.output;
-    carryIn = getGate(and1, and2, "OR")?.output;
+    carryIn = and1 ? getGate(and1, and2, "OR")?.output : and2;
   }
 
   return swaps.sort().join(",");
